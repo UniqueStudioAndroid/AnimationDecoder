@@ -21,7 +21,7 @@ package com.hustunique.apng_decoder
 
 import java.io.InputStream
 
-class APngFrameStream : InputStream() {
+class APngFrameStream() : InputStream() {
     override fun read(): Int {
         TODO("Not yet implemented")
     }

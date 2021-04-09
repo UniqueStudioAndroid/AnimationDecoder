@@ -21,58 +21,66 @@ package com.hustunique.apng_decoder
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-import com.hustunique.apng_decoder.PngChunkType.TYPE_ACTL
-import com.hustunique.apng_decoder.PngChunkType.TYPE_FCTL
-import com.hustunique.apng_decoder.PngChunkType.TYPE_FDAT
-import com.hustunique.apng_decoder.PngChunkType.TYPE_IDAT
-import com.hustunique.apng_decoder.PngChunkType.TYPE_IEND
-import com.hustunique.apng_decoder.PngChunkType.TYPE_IHDR
-import com.hustunique.apng_decoder.PngChunkType.TYPE_PLTE
-import com.hustunique.apng_decoder.PngChunkType.TYPE_TEXT
 import java.nio.ByteBuffer
 
-sealed class BaseChunk(
-    val length: Int,
-    val position: Int
+open class BaseChunk(
+    val readOnlyBuffer: ByteBuffer
 ) {
+    companion object {}
+
+    open val length: Int
+        get() = readOnlyBuffer.let {
+            println(it.position(0))
+            it.int
+        }
+
+    open val type: Int
+        get() = readOnlyBuffer.let {
+            it.position(4)
+            it.int
+        }
+
+    open val crc: Int
+        get() = readOnlyBuffer.let {
+            it.position(length + 8)
+            it.int
+        }
+
+    val chunkName: String
+        get() = String(ByteBuffer.allocate(4).putInt(type).array())
+
     override fun toString(): String {
-        return "${javaClass.simpleName}($position, $length)"
+        return "${chunkName}(length: $length)"
     }
 
-    companion object {
-
-    }
 }
 
-class IHDRChunk(length: Int, position: Int) : BaseChunk(length, position)
+class IHDRChunk(readOnlyBuffer: ByteBuffer) : BaseChunk(readOnlyBuffer)
 
-class PLTEChunk(length: Int, position: Int) : BaseChunk(length, position)
+class FDATChunk(readOnlyBuffer: ByteBuffer) : BaseChunk(readOnlyBuffer) {
 
-class IDATChunk(length: Int, position: Int) : BaseChunk(length, position)
+    override val length: Int
+        get() = super.length
 
-class IENDChunk(length: Int, position: Int) : BaseChunk(length, position)
+    override val type: Int
+        get() = PngChunkType.TYPE_IDAT
 
-class FDATChunk(length: Int, position: Int) : BaseChunk(length, position)
+    override val crc: Int
+        get() = super.crc
+}
 
-class ACTLChunk(length: Int, position: Int) : BaseChunk(length, position)
 
-class FCTLChunk(length: Int, position: Int) : BaseChunk(length, position)
+class ACTLChunk(readOnlyBuffer: ByteBuffer) : BaseChunk(readOnlyBuffer)
 
-class TEXTChunk(length: Int, position: Int) : BaseChunk(length, position)
+class FCTLChunk(readOnlyBuffer: ByteBuffer) : BaseChunk(readOnlyBuffer)
 
-class UnknownChunk(length: Int, position: Int) : BaseChunk(length, position)
-
-internal fun BaseChunk.Companion.makeChunk(type: Int, len: Int, position: Int) = when (type) {
-    TYPE_IHDR -> IHDRChunk(len, position)
-    TYPE_IDAT -> IDATChunk(len, position)
-    TYPE_PLTE -> PLTEChunk(len, position)
-    TYPE_IEND -> IENDChunk(len, position)
-    TYPE_ACTL -> ACTLChunk(len, position)
-    TYPE_FCTL -> FCTLChunk(len, position)
-    TYPE_FDAT -> FDATChunk(len, position)
-    TYPE_TEXT -> TEXTChunk(len, position)
-    else -> {
-        println(String.format("%x", type))
-        UnknownChunk(len, position)
-    }
+internal fun BaseChunk.Companion.makeChunk(
+    type: Int,
+    readOnlyBuffer: ByteBuffer
+) = when (type) {
+    PngChunkType.TYPE_IHDR -> IHDRChunk(readOnlyBuffer)
+    PngChunkType.TYPE_ACTL -> ACTLChunk(readOnlyBuffer)
+    PngChunkType.TYPE_FCTL -> FCTLChunk(readOnlyBuffer)
+    PngChunkType.TYPE_FDAT -> FDATChunk(readOnlyBuffer)
+    else -> BaseChunk(readOnlyBuffer)
 }
