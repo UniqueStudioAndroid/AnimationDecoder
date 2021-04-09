@@ -1,0 +1,1 @@
+/Users/xiaoyuxuan/project/ApngDecoder/buildSrc/build/classes/kotlin/main/Dep$AndroidX.class:/Users/xiaoyuxuan/project/ApngDecoder/buildSrc/build/classes/kotlin/main/Dep$Build.class:/Users/xiaoyuxuan/project/ApngDecoder/buildSrc/build/classes/kotlin/main/Dep$Kt.class:/Users/xiaoyuxuan/project/ApngDecoder/buildSrc/build/classes/kotlin/main/Dep.class
