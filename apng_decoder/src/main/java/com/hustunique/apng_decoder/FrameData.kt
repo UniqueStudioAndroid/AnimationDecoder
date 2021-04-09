@@ -1,7 +1,7 @@
 package com.hustunique.apng_decoder
 
 /**
- * Copyright (C) 2021 little-csd
+ * Copyright (C) 2021 Ski
  * All rights reserved.
  *
  * This library is free software; you can redistribute it and/or
@@ -18,23 +18,5 @@ package com.hustunique.apng_decoder
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
-
-import java.nio.ByteBuffer
-import kotlin.jvm.Throws
-
-class APngDecoder {
-
-    @Throws(IllegalStateException::class)
-    fun decode(data: ByteBuffer) {
-        val obj = APngObject(data)
-
-    }
-}
-
-// signature
-// acTL
-// IDAT
-// fcTL
-// fDAT
-// ...
-// IEND
+ 
+data class FrameData(val fctl: FCTLChunk, val chunks: ArrayList<BaseChunk>)

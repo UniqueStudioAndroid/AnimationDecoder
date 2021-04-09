@@ -77,6 +77,8 @@ class ACTLChunk(readOnlyBuffer: ByteBuffer) : BaseChunk(readOnlyBuffer)
 
 class FCTLChunk(readOnlyBuffer: ByteBuffer) : BaseChunk(readOnlyBuffer)
 
+class IDATChunk(readOnlyBuffer: ByteBuffer) : BaseChunk(readOnlyBuffer)
+
 internal fun BaseChunk.Companion.makeChunk(
     type: Int,
     readOnlyBuffer: ByteBuffer
@@ -85,5 +87,6 @@ internal fun BaseChunk.Companion.makeChunk(
     PngChunkType.TYPE_ACTL -> ACTLChunk(readOnlyBuffer)
     PngChunkType.TYPE_FCTL -> FCTLChunk(readOnlyBuffer)
     PngChunkType.TYPE_FDAT -> FDATChunk(readOnlyBuffer)
+    PngChunkType.TYPE_IDAT -> IDATChunk(readOnlyBuffer)
     else -> BaseChunk(readOnlyBuffer)
 }
