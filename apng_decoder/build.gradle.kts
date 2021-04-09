@@ -1,15 +1,14 @@
 plugins {
-    id("com.android.application")
-    kotlin("android")
+    id("com.android.library")
     id("kotlin-android")
 }
 
+
 android {
-    compileSdkVersion(30)
-    buildToolsVersion("30.0.2")
+    compileSdkVersion(Dep.Build.COMPILE_SDK_VERSION)
+    buildToolsVersion(Dep.Build.BUILD_TOOLS_VERSION)
 
     defaultConfig {
-        applicationId = Dep.Build.APPLICATION_ID
         minSdkVersion(Dep.Build.MIN_SDK_VERSION)
         targetSdkVersion(Dep.Build.TARGET_SDK_VERSION)
         versionCode = 1
@@ -22,11 +21,10 @@ android {
         getByName("release") {
             isMinifyEnabled = false
             proguardFiles(
-                    getDefaultProguardFile("proguard-android-optimize.txt"),
-                    "proguard-rules.pro"
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
             )
         }
-
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
@@ -37,17 +35,15 @@ android {
     }
     buildFeatures {
         viewBinding = true
-        prefab = true
     }
 }
 
+
 dependencies {
-    implementation(project(":apng_decoder"))
+
     implementation(kotlin("stdlib", Dep.Kt.KOTLIN_VERSION))
-    implementation(Dep.Kt.COROUTINE)
-    implementation(Dep.AndroidX.CORE)
-    implementation(Dep.AndroidX.APPCOMPAT)
-    implementation(Dep.AndroidX.MATERIAL)
-    implementation(Dep.AndroidX.CONSTRAINTLAYOUT)
-    implementation(Dep.AndroidX.LIVEDATA)
+    testImplementation(Dep.Test.JUNIT)
+
+    androidTestImplementation(Dep.Test.EXT_JUNIT)
+    androidTestImplementation(Dep.Test.ESPRESSO)
 }

@@ -5,6 +5,8 @@ object Dep {
         const val APPLICATION_ID = "com.hustunique.myapplication"
         const val MIN_SDK_VERSION = 21
         const val TARGET_SDK_VERSION = 30
+        const val COMPILE_SDK_VERSION = 30
+        const val BUILD_TOOLS_VERSION = "30.0.2"
         const val ANDROID_TOOLS = "com.android.tools.build:gradle:4.1.3"
     }
 
@@ -13,9 +15,12 @@ object Dep {
         const val COROUTINE = "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.9"
     }
 
-//    testImplementation 'junit:junit:4.+'
-//    androidTestImplementation 'androidx.test.ext:junit:1.1.2'
-//    androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
+    object Test {
+        const val JUNIT = "junit:junit:4.+"
+        const val EXT_JUNIT = "androidx.test.ext:junit:1.1.2"
+        const val ESPRESSO = "androidx.test.espresso:espresso-core:3.3.0"
+    }
+
     object AndroidX {
         const val CORE = "org.jetbrains.kotlin:kotlin-stdlib:1.4.31"
         const val APPCOMPAT = "androidx.appcompat:appcompat:1.2.0"
