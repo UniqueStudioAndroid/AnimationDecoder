@@ -29,17 +29,15 @@ class APngDecoder {
 
     private fun readAndUnBox(box: ByteBuffer): BaseChunk {
         val pos = box.position()
-        val len = box.int
+        val chunkLen = box.int + 12
         val type = box.int
-        println(
-            "len: $len, type: ${
-                String.format("%x", type)
-            }, pos: $pos"
-        )
+        // must add slice call
         val chunk =
-            BaseChunk.makeChunk(type, ByteBuffer.wrap(box.array(), pos, len + 12))
-        box.position(pos + len + 12)
-        println(chunk.toString())
+            BaseChunk.makeChunk(
+                type,
+                ByteBuffer.wrap(box.array(), pos, chunkLen).slice().asReadOnlyBuffer()
+            )
+        box.position(pos + chunkLen)
         return chunk
     }
 

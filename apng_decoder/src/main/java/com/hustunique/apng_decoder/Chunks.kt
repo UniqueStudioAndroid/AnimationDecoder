@@ -30,7 +30,7 @@ open class BaseChunk(
 
     open val length: Int
         get() = readOnlyBuffer.let {
-            println(it.position(0))
+            it.position(0)
             it.int
         }
 
@@ -67,8 +67,11 @@ class FDATChunk(readOnlyBuffer: ByteBuffer) : BaseChunk(readOnlyBuffer) {
 
     override val crc: Int
         get() = super.crc
-}
 
+    override fun toString(): String {
+        return "fdAT(length: $length)"
+    }
+}
 
 class ACTLChunk(readOnlyBuffer: ByteBuffer) : BaseChunk(readOnlyBuffer)
 
