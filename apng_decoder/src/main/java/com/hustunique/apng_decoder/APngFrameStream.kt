@@ -41,7 +41,10 @@ class APngFrameStream(
     }.asReadable()
 
 
-    override fun read(): Int = readableChunkList.read().toInt()
+    @ExperimentalUnsignedTypes
+    override fun read() =
+        if (readableChunkList.available() > 0) readableChunkList.read().toUByte().toInt()
+        else -1
 
     override fun available(): Int = readableChunkList.available()
 }
