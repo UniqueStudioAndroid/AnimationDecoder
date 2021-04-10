@@ -26,7 +26,7 @@ import java.util.zip.CRC32
 
 open class BaseChunk(
     val readOnlyBuffer: ByteBuffer
-) {
+) : Readable {
     companion object {}
 
     open val length: Int
@@ -40,6 +40,10 @@ open class BaseChunk(
 
     val chunkName: String
         get() = String(ByteBuffer.allocate(4).putInt(type).array())
+
+    override fun read(): Byte = readOnlyBuffer.get()
+
+    override fun size(): Int = length + 12
 
     override fun toString(): String {
         return "${chunkName}(length: $length)"
