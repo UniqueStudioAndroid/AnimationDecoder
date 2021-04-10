@@ -48,8 +48,6 @@ class APngObject(data: ByteBuffer) {
 
     fun getFrames(): List<RawFrameData> = frames
 
-    fun frameSize() = frames.size
-
     fun getOthersChunk(): List<BaseChunk> = others
 
     fun getHeader(): IHDRChunk = header
@@ -67,7 +65,7 @@ class APngObject(data: ByteBuffer) {
         val chunk =
             BaseChunk.makeChunk(
                 type,
-                ByteBuffer.wrap(box.array(), pos, chunkLen).slice()//.asReadOnlyBuffer()
+                ByteBuffer.wrap(box.array(), pos, chunkLen).slice()
             )
         box.position(pos + chunkLen)
         return chunk
@@ -79,7 +77,7 @@ class APngObject(data: ByteBuffer) {
                 header = chunk
             }
             is ACTLChunk -> {
-                check(actl == null) { "Two ACTL Chunk" }
+                check(actl == null) { "Two acTL Chunk" }
                 actl = chunk
             }
             is FCTLChunk -> {

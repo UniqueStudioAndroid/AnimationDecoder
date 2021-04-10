@@ -36,8 +36,8 @@ class APngFrameStream(
     private val readableChunkList = mutableListOf<Readable>().apply {
         add(SIGNATURE.asReadOnlyBuffer().asReadable())
         add(header.makeFakeIHDRReadable(rawFrameData.fctl))
-        addAll(rawFrameData.chunks)
-        addAll(others)
+        addAll(rawFrameData.chunks.map { it.asReadable() })
+        addAll(others.map { it.asReadable() })
     }.asReadable()
 
 
@@ -48,8 +48,3 @@ class APngFrameStream(
 
     override fun available(): Int = readableChunkList.available()
 }
-
-//fun APngObject.frameDataStream(frameIndex: Int): APngFrameStream {
-//    check(frameIndex < frameSize())
-//    return APngFrameStream(getHeader(), getFrame(frameIndex), getOthersChunk())
-//}

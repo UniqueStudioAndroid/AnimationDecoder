@@ -21,7 +21,6 @@ import java.nio.ByteBuffer
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-
 interface Readable {
 
     fun read(): Byte
@@ -37,9 +36,11 @@ internal fun List<Readable>.asReadable(): Readable = object : Readable {
 
     private var curChunk = this@asReadable[curReadableIdx++]
 
-    private val readableSizeList = this@asReadable.map { it.available() }.runningReduce { acc, i ->
-        acc + i
-    }
+    private val readableSizeList = this@asReadable
+        .map { it.available() }
+        .runningReduce { acc, i ->
+            acc + i
+        }
 
     override fun read(): Byte {
         curChunk = if (curPos++ < readableSizeList[curReadableIdx - 1]) curChunk
@@ -53,8 +54,9 @@ internal fun List<Readable>.asReadable(): Readable = object : Readable {
 /**
  * Translate Int object to a Readable
  * (Default byte order is BitEndian)
-*/
+ */
 internal fun Int.asReadable(isBigEndian: Boolean = false): Readable = object : Readable {
+
     private var curIndex = 0
 
     override fun read(): Byte {
@@ -68,15 +70,15 @@ internal fun Int.asReadable(isBigEndian: Boolean = false): Readable = object : R
     }
 }
 
-internal fun ByteBuffer.asReadable(offset: Int = 0, size: Int = capacity()): Readable = object : Readable {
-    private val readByteBuffer = this@asReadable.let {
-        it.position(offset)
-        it.limit(size + offset)
-        it.slice()
+internal fun ByteBuffer.asReadable(offset: Int = 0, size: Int = capacity()): Readable =
+    object : Readable {
+        private val readByteBuffer = this@asReadable.let {
+            it.position(offset)
+            it.limit(size + offset)
+            it.slice()
+        }
+
+        override fun read(): Byte = readByteBuffer.get()
+
+        override fun available(): Int = readByteBuffer.remaining()
     }
-
-    override fun read(): Byte = readByteBuffer.get()
-
-    override fun available(): Int = readByteBuffer.remaining()
-}
-

@@ -21,10 +21,11 @@ package com.hustunique.apng_decoder
 
 import android.graphics.BitmapFactory
 import java.nio.ByteBuffer
+import kotlin.jvm.Throws
 
 class APngDecoder {
 
-    @Throws(IllegalStateException::class)
+    @Throws(IllegalStateException::class, IllegalArgumentException::class)
     fun decode(data: ByteBuffer): List<Frame> {
         val obj = APngObject(data)
         return obj.getFrames()
