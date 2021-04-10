@@ -46,6 +46,8 @@ class APngObject(data: ByteBuffer) {
 
     fun getFrame(index: Int): RawFrameData = frames[index]
 
+    fun getFrames(): List<RawFrameData> = frames
+
     fun frameSize() = frames.size
 
     fun getOthersChunk(): List<BaseChunk> = others

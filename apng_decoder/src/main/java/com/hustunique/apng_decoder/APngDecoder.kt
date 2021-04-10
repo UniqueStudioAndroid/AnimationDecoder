@@ -19,6 +19,7 @@ package com.hustunique.apng_decoder
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
+import android.graphics.BitmapFactory
 import java.nio.ByteBuffer
 
 class APngDecoder {
@@ -26,13 +27,11 @@ class APngDecoder {
     @Throws(IllegalStateException::class)
     fun decode(data: ByteBuffer): List<Frame> {
         val obj = APngObject(data)
-        val stream = obj.frameDataStream(1)
-        return arrayListOf()
-//        return try {
-//            BitmapFactory.decodeStream(stream)
-//        } catch (e: Exception) {
-//            e.printStackTrace()
-//            null
-//        }
+        return obj.getFrames()
+            .map {
+                val stream = APngFrameStream(obj.getHeader(), it, obj.getOthersChunk())
+                Frame(BitmapFactory.decodeStream(stream), it.fctl.toFrameOptions())
+            }
+            .toList()
     }
 }

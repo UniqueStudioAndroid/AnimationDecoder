@@ -49,8 +49,7 @@ class APngFrameStream(
     override fun available(): Int = readableChunkList.available()
 }
 
-
-fun APngObject.frameDataStream(frameIndex: Int): APngFrameStream {
-    check(frameIndex < frameSize())
-    return APngFrameStream(getHeader(), getFrame(frameIndex), getOthersChunk())
-}
+//fun APngObject.frameDataStream(frameIndex: Int): APngFrameStream {
+//    check(frameIndex < frameSize())
+//    return APngFrameStream(getHeader(), getFrame(frameIndex), getOthersChunk())
+//}

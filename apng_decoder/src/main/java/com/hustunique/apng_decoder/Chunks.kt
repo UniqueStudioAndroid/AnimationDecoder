@@ -25,6 +25,8 @@ import org.jetbrains.annotations.TestOnly
 import java.nio.ByteBuffer
 import java.util.zip.CRC32
 
+const val MIN_FRAME_INTERVAL = 10L
+
 open class BaseChunk(
     val readOnlyBuffer: ByteBuffer
 ) : Readable {
@@ -119,6 +121,19 @@ class FCTLChunk(readOnlyBuffer: ByteBuffer) : BaseChunk(readOnlyBuffer) {
     val height = readAt(16)
     val xOffset = readAt(20)
     val yOffset = readAt(24)
+    val delayed = let {
+        val num = readAt(28, 2)
+        val denum = readAt(30, 2)
+        when {
+            denum == 0 -> 10L
+            num == 0 -> MIN_FRAME_INTERVAL
+            else -> 1000L * num / denum
+        }
+    }
+    val disposeOp = readAt(32, 1).toByte()
+    val blendOp = readAt(33, 1).toByte()
+
+    fun toFrameOptions(): FrameOptions = FrameOptions(width, height, xOffset, yOffset, delayed, disposeOp, blendOp = blendOp)
 
     override fun toString(): String {
         return super.toString() + " size = ($width, $height), offset = ($xOffset, $yOffset)"
@@ -139,10 +154,14 @@ internal fun BaseChunk.Companion.makeChunk(
     else -> BaseChunk(readOnlyBuffer)
 }
 
-internal fun BaseChunk.readAt(index: Int): Int {
+internal fun BaseChunk.readAt(index: Int, len: Int = 4): Int {
     val position = readOnlyBuffer.position()
     readOnlyBuffer.position(index)
-    val value = readOnlyBuffer.int
+    val value = when (len) {
+        4 -> readOnlyBuffer.int
+        2 -> readOnlyBuffer.short.toUInt().toInt()
+        else -> readOnlyBuffer.get().toUInt().toInt()
+    }
     readOnlyBuffer.position(position)
     return value
 }
