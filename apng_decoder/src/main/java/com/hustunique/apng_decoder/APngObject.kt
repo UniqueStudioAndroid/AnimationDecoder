@@ -81,6 +81,7 @@ class APngObject(data: ByteBuffer) {
                 actl = chunk
             }
             is FCTLChunk -> {
+                check(this::header.isInitialized) { "Header not initialized" }
                 frame?.apply { frames.add(this) }
                 frame = FrameData(chunk, ArrayList())
             }

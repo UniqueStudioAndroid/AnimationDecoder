@@ -68,9 +68,10 @@ internal fun Int.asReadable(isBigEndian: Boolean = false): Readable = object : R
     }
 }
 
-internal fun ByteBuffer.asReadable(offset: Int = 0): Readable = object : Readable {
+internal fun ByteBuffer.asReadable(offset: Int = 0, size: Int = capacity()): Readable = object : Readable {
     private val readByteBuffer = this@asReadable.let {
         it.position(offset)
+        it.limit(size)
         it.slice()
     }
 

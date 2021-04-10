@@ -61,7 +61,20 @@ open class BaseChunk(
     }
 }
 
-class IHDRChunk(readOnlyBuffer: ByteBuffer) : BaseChunk(readOnlyBuffer)
+class IHDRChunk(readOnlyBuffer: ByteBuffer) : BaseChunk(readOnlyBuffer) {
+    fun makeFakeIHDRReadable(chunk: FCTLChunk): Readable {
+        val buffer = ByteBuffer.allocate(readOnlyBuffer.capacity())
+            .putInt(dataLen)
+            .putInt(type)
+            .putInt(chunk.width)
+            .putInt(chunk.height)
+            .put(readOnlyBuffer.array(), readOnlyBuffer.arrayOffset() + 16, 5)
+        val crc = CRC32()
+        crc.update(buffer.array(), 4, buffer.position() - 4)
+        buffer.putInt(crc.value.toInt())
+        return buffer.asReadable()
+    }
+}
 
 class FDATChunk(readOnlyBuffer: ByteBuffer) : BaseChunk(readOnlyBuffer) {
 
@@ -74,22 +87,20 @@ class FDATChunk(readOnlyBuffer: ByteBuffer) : BaseChunk(readOnlyBuffer) {
     override val crc: Int
         get() = innerCRC
 
-    private val innerCRC: Int
-
-    init {
+    private val innerCRC = let {
         val crcEngine = CRC32()
         ByteBuffer.allocate(4).putInt(type).array().forEach {
             crcEngine.update(it.toInt())
         }
         crcEngine.update(readOnlyBuffer.array(), readOnlyBuffer.arrayOffset() + 12, dataLen)
-        innerCRC = crcEngine.value.toInt()
+        crcEngine.value.toInt()
     }
 
     private val readable = listOf(
         dataLen.asReadable(),
         type.asReadable(),
-        readOnlyBuffer.asReadable(12),
-        crc.asReadable(),
+        readOnlyBuffer.asReadable(12, dataLen),
+        innerCRC.asReadable(),
     ).asReadable()
 
     override fun toString(): String {
@@ -103,7 +114,16 @@ class FDATChunk(readOnlyBuffer: ByteBuffer) : BaseChunk(readOnlyBuffer) {
 
 class ACTLChunk(readOnlyBuffer: ByteBuffer) : BaseChunk(readOnlyBuffer)
 
-class FCTLChunk(readOnlyBuffer: ByteBuffer) : BaseChunk(readOnlyBuffer)
+class FCTLChunk(readOnlyBuffer: ByteBuffer) : BaseChunk(readOnlyBuffer) {
+    val width = readAt(12)
+    val height = readAt(16)
+    val xOffset = readAt(20)
+    val yOffset = readAt(24)
+
+    override fun toString(): String {
+        return super.toString() + " size = ($width, $height), offset = ($xOffset, $yOffset)"
+    }
+}
 
 class IDATChunk(readOnlyBuffer: ByteBuffer) : BaseChunk(readOnlyBuffer)
 

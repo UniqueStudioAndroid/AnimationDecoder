@@ -19,7 +19,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun initView() {
-        val buffer = ByteBuffer.wrap(assets.open("elephant.png").readBytes()).array()
+        val buffer = ByteBuffer.wrap(assets.open("elephant2.png").readBytes()).array()
         val bm = BitmapFactory.decodeByteArray(buffer, 0, buffer.size)
 //        val bm = APngDecoder().decode(buffer)
         val d = AnimatedImageDrawable(listOf(bm!!))
