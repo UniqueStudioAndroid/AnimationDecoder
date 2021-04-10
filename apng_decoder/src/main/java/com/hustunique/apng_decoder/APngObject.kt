@@ -24,9 +24,9 @@ import java.nio.ByteBuffer
 class APngObject(data: ByteBuffer) {
     private lateinit var header: IHDRChunk
     private var actl: ACTLChunk? = null
-    private val frames = ArrayList<FrameData>()
+    private val frames = ArrayList<RawFrameData>()
     private val others = ArrayList<BaseChunk>()
-    private var frame: FrameData? = null
+    private var rawFrame: RawFrameData? = null
 
     companion object {
         const val PNG_SIGNATURE = (0x89_50_4E_47 shl 32) + 0x0D_0A_1A_0A
@@ -41,10 +41,10 @@ class APngObject(data: ByteBuffer) {
         check(this::header.isInitialized) {
             "Png file has no IHDRChunk"
         }
-        frame?.apply { frames.add(this) }
+        rawFrame?.apply { frames.add(this) }
     }
 
-    fun getFrame(index: Int): FrameData = frames[index]
+    fun getFrame(index: Int): RawFrameData = frames[index]
 
     fun frameSize() = frames.size
 
@@ -82,14 +82,14 @@ class APngObject(data: ByteBuffer) {
             }
             is FCTLChunk -> {
                 check(this::header.isInitialized) { "Header not initialized" }
-                frame?.apply { frames.add(this) }
-                frame = FrameData(chunk, ArrayList())
+                rawFrame?.apply { frames.add(this) }
+                rawFrame = RawFrameData(chunk, ArrayList())
             }
             is FDATChunk -> {
-                check(frame != null) { "fdAT Chunk before fcTL chunk" }
-                frame?.chunks?.add(chunk)
+                check(rawFrame != null) { "fdAT Chunk before fcTL chunk" }
+                rawFrame?.chunks?.add(chunk)
             }
-            is IDATChunk -> frame?.chunks?.add(chunk)
+            is IDATChunk -> rawFrame?.chunks?.add(chunk)
             else -> others.add(chunk)
         }
     }

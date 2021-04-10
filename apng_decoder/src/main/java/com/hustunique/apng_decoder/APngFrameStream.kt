@@ -24,7 +24,7 @@ import java.nio.ByteBuffer
 
 class APngFrameStream(
     header: IHDRChunk,
-    frameData: FrameData,
+    rawFrameData: RawFrameData,
     others: List<BaseChunk>
 ) :
     InputStream() {
@@ -35,8 +35,8 @@ class APngFrameStream(
 
     private val readableChunkList = mutableListOf<Readable>().apply {
         add(SIGNATURE.asReadOnlyBuffer().asReadable())
-        add(header.makeFakeIHDRReadable(frameData.fctl))
-        addAll(frameData.chunks)
+        add(header.makeFakeIHDRReadable(rawFrameData.fctl))
+        addAll(rawFrameData.chunks)
         addAll(others)
     }.asReadable()
 

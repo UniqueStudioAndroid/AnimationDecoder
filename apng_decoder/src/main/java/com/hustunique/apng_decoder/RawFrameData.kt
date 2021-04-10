@@ -18,21 +18,5 @@ package com.hustunique.apng_decoder
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
-
-import java.nio.ByteBuffer
-
-class APngDecoder {
-
-    @Throws(IllegalStateException::class)
-    fun decode(data: ByteBuffer): List<Frame> {
-        val obj = APngObject(data)
-        val stream = obj.frameDataStream(1)
-        return arrayListOf()
-//        return try {
-//            BitmapFactory.decodeStream(stream)
-//        } catch (e: Exception) {
-//            e.printStackTrace()
-//            null
-//        }
-    }
-}
+ 
+data class RawFrameData(val fctl: FCTLChunk, val chunks: ArrayList<BaseChunk>)
