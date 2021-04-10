@@ -3,6 +3,7 @@ package com.hustunique.apng_decoder
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import java.io.File
+import java.io.FileOutputStream
 import java.nio.ByteBuffer
 
 /**
@@ -20,6 +21,14 @@ class ExampleUnitTest {
     fun run() {
         val file = File("elephant.png")
         val decoder = APngDecoder()
-        decoder.decode(ByteBuffer.wrap(file.readBytes()))
+        val input = decoder.decode(ByteBuffer.wrap(file.readBytes()))
+        val file2 = File("elephant2.png")
+        if (file2.exists()) {
+            file2.delete()
+            file2.createNewFile()
+        }
+        val fos = FileOutputStream(file2)
+        val data = input.readBytes()
+        fos.write(data)
     }
 }

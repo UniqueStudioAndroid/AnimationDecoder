@@ -65,14 +65,12 @@ class FDATChunk(readOnlyBuffer: ByteBuffer) : BaseChunk(readOnlyBuffer) {
 
     private val innerCRC: Int
 
-    private val readable by lazy {
-        listOf(
-            dataLen.asReadable(),
-            type.asReadable(),
-            readOnlyBuffer.asReadable(12),
-            crc.asReadable(),
-        ).asReadable()
-    }
+    private val readable = listOf(
+        dataLen.asReadable(),
+        type.asReadable(),
+        readOnlyBuffer.asReadable(12),
+        crc.asReadable(),
+    ).asReadable()
 
     init {
         val crcEngine = CRC32()
@@ -86,6 +84,8 @@ class FDATChunk(readOnlyBuffer: ByteBuffer) : BaseChunk(readOnlyBuffer) {
     }
 
     override fun read(): Byte = readable.read()
+
+    override fun available() = readable.available()
 }
 
 class ACTLChunk(readOnlyBuffer: ByteBuffer) : BaseChunk(readOnlyBuffer)

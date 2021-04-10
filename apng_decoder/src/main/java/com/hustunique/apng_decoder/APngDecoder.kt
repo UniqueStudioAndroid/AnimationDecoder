@@ -21,6 +21,7 @@ package com.hustunique.apng_decoder
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import java.io.InputStream
 import java.lang.Exception
 import java.nio.ByteBuffer
 import kotlin.jvm.Throws
@@ -28,15 +29,15 @@ import kotlin.jvm.Throws
 class APngDecoder {
 
     @Throws(IllegalStateException::class)
-    fun decode(data: ByteBuffer) : Bitmap? {
+    fun decode(data: ByteBuffer) : InputStream {
         val obj = APngObject(data)
-        val stream = obj.frameDataStream(0)
+        return obj.frameDataStream(1)
 
-        return try {
-            BitmapFactory.decodeStream(stream)
-        } catch (e: Exception) {
-            e.printStackTrace()
-            null
-        }
+//        return try {
+//            BitmapFactory.decodeStream(stream)
+//        } catch (e: Exception) {
+//            e.printStackTrace()
+//            null
+//        }
     }
 }

@@ -54,12 +54,13 @@ internal fun List<Readable>.asReadable(): Readable = object : Readable {
  * Translate Int object to a Readable
  * (Default byte order is BitEndian)
 */
-internal fun Int.asReadable(isBigEndian: Boolean = true): Readable = object : Readable {
+internal fun Int.asReadable(isBigEndian: Boolean = false): Readable = object : Readable {
     private var curIndex = 0
 
     override fun read(): Byte {
-        val idx = if (isBigEndian) curIndex else 4 - curIndex
-        return ((this@asReadable ushr idx * 8) and 0xFF).toByte()
+        val idx = if (isBigEndian) curIndex else 3 - curIndex
+        curIndex++
+        return ((this@asReadable ushr (idx * 8)) and 0xFF).toByte()
     }
 
     override fun available(): Int {
