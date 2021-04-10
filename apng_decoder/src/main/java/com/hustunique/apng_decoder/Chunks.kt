@@ -21,6 +21,7 @@ package com.hustunique.apng_decoder
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
+import org.jetbrains.annotations.TestOnly
 import java.nio.ByteBuffer
 import java.util.zip.CRC32
 
@@ -48,6 +49,16 @@ open class BaseChunk(
     override fun toString(): String {
         return "${chunkName}(length: $dataLen)"
     }
+
+    @TestOnly
+    fun computeCRC(): Int {
+        val crcEngine = CRC32()
+        ByteBuffer.allocate(4).putInt(type).array().forEach {
+            crcEngine.update(it.toInt())
+        }
+        crcEngine.update(readOnlyBuffer.array(), readOnlyBuffer.arrayOffset() + 8, dataLen)
+        return crcEngine.value.toInt()
+    }
 }
 
 class IHDRChunk(readOnlyBuffer: ByteBuffer) : BaseChunk(readOnlyBuffer)
@@ -65,19 +76,21 @@ class FDATChunk(readOnlyBuffer: ByteBuffer) : BaseChunk(readOnlyBuffer) {
 
     private val innerCRC: Int
 
+    init {
+        val crcEngine = CRC32()
+        ByteBuffer.allocate(4).putInt(type).array().forEach {
+            crcEngine.update(it.toInt())
+        }
+        crcEngine.update(readOnlyBuffer.array(), readOnlyBuffer.arrayOffset() + 12, dataLen)
+        innerCRC = crcEngine.value.toInt()
+    }
+
     private val readable = listOf(
         dataLen.asReadable(),
         type.asReadable(),
         readOnlyBuffer.asReadable(12),
         crc.asReadable(),
     ).asReadable()
-
-    init {
-        val crcEngine = CRC32()
-        crcEngine.update(type)
-        crcEngine.update(readOnlyBuffer.array(), 12, dataLen)
-        innerCRC = crcEngine.value.toInt()
-    }
 
     override fun toString(): String {
         return "fdAT(length: $dataLen)"

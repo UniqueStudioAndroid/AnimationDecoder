@@ -34,10 +34,10 @@ class APngFrameStream(
     }
 
     private val readableChunkList = mutableListOf<Readable>().apply {
-        add(SIGNATURE.asReadOnlyBuffer().asReadable())
-        add(header)
+//        add(SIGNATURE.asReadOnlyBuffer().asReadable())
+//        add(header)
         addAll(frameData.chunks)
-        addAll(others)
+//        addAll(others)
     }.asReadable()
 
 

@@ -5,6 +5,7 @@ import org.junit.Test
 import java.io.File
 import java.io.FileOutputStream
 import java.nio.ByteBuffer
+import java.util.zip.CRC32
 
 /**
  * Example local unit test, which will execute on the development machine (host).
@@ -30,5 +31,32 @@ class ExampleUnitTest {
         val fos = FileOutputStream(file2)
         val data = input.readBytes()
         fos.write(data)
+    }
+
+    @Test
+    fun testTrunkCRCInFile() {
+        val data = File("elephant2.png").readBytes()
+        val data2 = ByteArray(data.size - 8)
+        data.copyInto(data2, 0, 4, data.size - 4)
+        val crc = CRC32().apply {
+            reset()
+            update(data2)
+        }
+        val buffer = ByteBuffer.wrap(data)
+        buffer.position(data.size - 4)
+        val value = buffer.int
+        println(String.format("%x %x", value, crc.value))
+        assert(value == crc.value.toInt())
+    }
+
+    @Test
+    fun testCRC2() {
+        val data = ByteBuffer.wrap(File("elephant.png").readBytes())
+        val obj = APngObject(data)
+        val frame = obj.getFrame(1)
+        frame.chunks.forEach {
+            println(it)
+            assertEquals(it.crc, it.computeCRC())
+        }
     }
 }
