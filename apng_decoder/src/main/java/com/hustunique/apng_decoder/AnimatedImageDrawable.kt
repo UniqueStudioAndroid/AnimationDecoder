@@ -1,8 +1,8 @@
 package com.hustunique.apng_decoder
 
-import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.ColorFilter
+import android.graphics.Paint
 import android.graphics.PixelFormat
 import android.graphics.drawable.Animatable
 import android.graphics.drawable.Drawable
@@ -32,69 +32,68 @@ class AnimatedImageDrawable() : Drawable(), Animatable {
 
     companion object {
         private const val TAG = "AnimatedImageDrawable"
-        private const val ANIMATION_GAP = 200
+        private const val ANIMATION_GAP = 200L
     }
 
-    private var starting = false
+    private var mStarting = false
 
     @Volatile
-    private var running = false
+    private var mRunning = false
 
-    private var bitmapList: List<Bitmap>? = null
+    private var mFrameList: List<Frame>? = null
 
-    private var curIdx = 0
+    private var mCurIdx = 0
 
-    private var updater = Runnable {
-        if (running) {
+    private val mPaint = Paint()
+
+    private var mUpdater = Runnable {
+        if (mRunning) {
             invalidateSelf()
         }
     }
 
-
-    constructor(bitmapList: List<Bitmap>) : this() {
-        this.bitmapList = bitmapList
+    constructor(frameList: List<Frame>) : this() {
+        this.mFrameList = frameList
     }
 
-
     override fun draw(canvas: Canvas) {
-        if (starting) {
-            starting = false
-            running = true
+        if (mStarting) {
+            mStarting = false
+            mRunning = true
         }
-        bitmapList?.let {
-            it.get(curIdx++ % it.size).apply {
-                canvas.drawBitmap(
-                    this,
-                    curIdx.toFloat() * 10 % width,
-                    curIdx.toFloat() * 10 % height,
-                    null
-                )
+        mFrameList?.let {
+            it[mCurIdx++ % it.size]
+        }?.run {
+            options.run {
+                canvas.drawBitmap(image, xOffsetF, yOffsetF, mPaint)
+                scheduleSelf(mUpdater, nextAnimationTime(delayInMillis))
             }
         }
-
         Log.i(TAG, "draw: ${System.currentTimeMillis()}")
-
-        scheduleSelf(updater, nextAnimationTime())
     }
 
     override fun setAlpha(alpha: Int) {
+        mPaint.alpha = alpha
     }
 
     override fun setColorFilter(colorFilter: ColorFilter?) {
+        mPaint.colorFilter = colorFilter
     }
 
     override fun getOpacity(): Int = PixelFormat.TRANSLUCENT
 
     override fun start() {
-        starting = true
+        mStarting = true
         invalidateSelf()
     }
 
     override fun stop() {
-        running = false
+        mRunning = false
+        mStarting = false
     }
 
-    override fun isRunning(): Boolean = running
+    override fun isRunning(): Boolean = mRunning
 
-    private fun nextAnimationTime(): Long = SystemClock.uptimeMillis() + ANIMATION_GAP
+    private fun nextAnimationTime(delayInMillis: Long = ANIMATION_GAP): Long =
+        SystemClock.uptimeMillis() + delayInMillis
 }

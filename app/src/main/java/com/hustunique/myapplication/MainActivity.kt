@@ -21,8 +21,8 @@ class MainActivity : AppCompatActivity() {
     private fun initView() {
         val buffer = ByteBuffer.wrap(assets.open("elephant.png").readBytes())//.array()
 //        val bm = BitmapFactory.decodeByteArray(buffer, 0, buffer.size)
-        val bm = APngDecoder().decode(buffer)
-        val d = AnimatedImageDrawable(listOf(bm!!))
+        val frameList = APngDecoder().decode(buffer)
+        val d = AnimatedImageDrawable(frameList)
         binding.img.setImageDrawable(d)
         binding.button.setOnClickListener {
             if (d.isRunning) {

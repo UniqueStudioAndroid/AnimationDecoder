@@ -43,4 +43,8 @@ data class FrameOptions(
             "error png format(blendOp out of range)"
         }
     }
+
+    val xOffsetF: Float = xOffset.toFloat()
+
+    val yOffsetF: Float = yOffset.toFloat()
 }
