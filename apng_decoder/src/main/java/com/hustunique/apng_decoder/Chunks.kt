@@ -22,6 +22,7 @@ package com.hustunique.apng_decoder
  */
 
 import java.nio.ByteBuffer
+import java.util.zip.CRC32
 
 open class BaseChunk(
     val readOnlyBuffer: ByteBuffer
@@ -29,22 +30,13 @@ open class BaseChunk(
     companion object {}
 
     open val length: Int
-        get() = readOnlyBuffer.let {
-            it.position(0)
-            it.int
-        }
+        get() = readAt(0)
 
     open val type: Int
-        get() = readOnlyBuffer.let {
-            it.position(4)
-            it.int
-        }
+        get() = readAt(4)
 
     open val crc: Int
-        get() = readOnlyBuffer.let {
-            it.position(length + 8)
-            it.int
-        }
+        get() = readAt(length + 8)
 
     val chunkName: String
         get() = String(ByteBuffer.allocate(4).putInt(type).array())
@@ -53,6 +45,7 @@ open class BaseChunk(
         return "${chunkName}(length: $length)"
     }
 
+    open fun read() = readOnlyBuffer.get()
 }
 
 class IHDRChunk(readOnlyBuffer: ByteBuffer) : BaseChunk(readOnlyBuffer)
@@ -60,16 +53,33 @@ class IHDRChunk(readOnlyBuffer: ByteBuffer) : BaseChunk(readOnlyBuffer)
 class FDATChunk(readOnlyBuffer: ByteBuffer) : BaseChunk(readOnlyBuffer) {
 
     override val length: Int
-        get() = super.length
+        get() = super.length - 4
 
     override val type: Int
         get() = PngChunkType.TYPE_IDAT
 
     override val crc: Int
-        get() = super.crc
+        get() = innerCRC
+
+    private val innerCRC: Int
+
+    init {
+        val crcEngine = CRC32()
+        crcEngine.update(type)
+        crcEngine.update(readOnlyBuffer.array(), 12, length)
+        innerCRC = crcEngine.value.toInt()
+    }
 
     override fun toString(): String {
         return "fdAT(length: $length)"
+    }
+
+    private var position = 0
+    override fun read() : Byte {
+        val len = length
+        if (position in 8 until len)
+        position++
+        return readByteInInt(position - length - 12, )
     }
 }
 
@@ -89,4 +99,12 @@ internal fun BaseChunk.Companion.makeChunk(
     PngChunkType.TYPE_FDAT -> FDATChunk(readOnlyBuffer)
     PngChunkType.TYPE_IDAT -> IDATChunk(readOnlyBuffer)
     else -> BaseChunk(readOnlyBuffer)
+}
+
+internal fun BaseChunk.readAt(index: Int) : Int {
+    val position = readOnlyBuffer.position()
+    readOnlyBuffer.position(index)
+    val value = readOnlyBuffer.int
+    readOnlyBuffer.position(position)
+    return value
 }

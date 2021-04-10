@@ -27,7 +27,6 @@ class APngDecoder {
     @Throws(IllegalStateException::class)
     fun decode(data: ByteBuffer) {
         val obj = APngObject(data)
-
     }
 }
 

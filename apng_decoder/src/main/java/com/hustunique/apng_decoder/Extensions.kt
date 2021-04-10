@@ -20,3 +20,12 @@ package com.hustunique.apng_decoder
  */
 
 fun runnable(r: () -> Unit): Runnable = Runnable { TODO("Not yet implemented") }
+
+/**
+ * Compute ith byte in value (Default byte order is BitEndian)
+ * Note: i start from 1
+ */
+fun readByteInInt(i: Int, value: Int, isBigEndian: Boolean = true) : Byte {
+    val idx = if (isBigEndian) i else 5 - i
+    return ((value ushr idx * 8) and 0xFF).toByte()
+}
