@@ -1,4 +1,4 @@
-package com.hustunique.apng_decoder
+package com.hustunique.apng_decoder.internal
 
 /**
  * Copyright (C) 2021 little-csd
@@ -19,7 +19,7 @@ package com.hustunique.apng_decoder
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-object PngChunkType {
+internal object PngChunkType {
     const val TYPE_IHDR = 0x49484452
     const val TYPE_IDAT = 0x49444154
     const val TYPE_IEND = 0x49454E44

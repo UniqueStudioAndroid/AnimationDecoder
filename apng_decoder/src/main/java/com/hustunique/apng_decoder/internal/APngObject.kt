@@ -1,4 +1,4 @@
-package com.hustunique.apng_decoder
+package com.hustunique.apng_decoder.internal
 
 import java.nio.ByteBuffer
 
@@ -21,6 +21,9 @@ import java.nio.ByteBuffer
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
+/**
+ * Represent a png file, extract from [data]
+ */
 class APngObject(data: ByteBuffer) {
     private lateinit var header: IHDRChunk
     private var actl: ACTLChunk? = null

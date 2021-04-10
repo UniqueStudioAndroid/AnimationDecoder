@@ -1,5 +1,6 @@
-package com.hustunique.apng_decoder
+package com.hustunique.apng_decoder.internal
 
+import java.nio.BufferUnderflowException
 import java.nio.ByteBuffer
 
 /**
@@ -21,13 +22,31 @@ import java.nio.ByteBuffer
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
+/**
+ * An interface represents all readable source.
+ *
+ * NOTE: Thread Safe
+ */
 interface Readable {
 
+    /**
+     * Read next byte of its source
+     * Throw [BufferUnderflowException] if no byte is available
+     *
+     * @return next byte of this readable source.
+     */
     fun read(): Byte
 
+    /**
+     * @return bytes count available for read
+     */
     fun available(): Int
 }
 
+/**
+ * Merge a List<[Readable]> object into a Readable one
+ * NOTE: Default byte order is BitEndian
+ */
 internal fun List<Readable>.asReadable(): Readable = object : Readable {
 
     private var curPos = 0
@@ -53,7 +72,7 @@ internal fun List<Readable>.asReadable(): Readable = object : Readable {
 
 /**
  * Translate Int object to a Readable
- * (Default byte order is BitEndian)
+ * NOTE: Default byte order is BitEndian
  */
 internal fun Int.asReadable(isBigEndian: Boolean = false): Readable = object : Readable {
 
@@ -70,6 +89,10 @@ internal fun Int.asReadable(isBigEndian: Boolean = false): Readable = object : R
     }
 }
 
+/**
+ * Wrap [ByteBuffer] object to a Readable
+ * NOTE: Default byte order is BitEndian
+ */
 internal fun ByteBuffer.asReadable(offset: Int = 0, size: Int = capacity()): Readable =
     object : Readable {
         private val readByteBuffer = this@asReadable.let {

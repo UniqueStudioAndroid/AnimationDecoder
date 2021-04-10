@@ -1,4 +1,4 @@
-package com.hustunique.apng_decoder
+package com.hustunique.apng_decoder.internal
 
 /**
  * Copyright (C) 2021 little-csd
@@ -19,9 +19,15 @@ package com.hustunique.apng_decoder
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
+import com.hustunique.apng_decoder.Readable
+import com.hustunique.apng_decoder.asReadable
 import java.io.InputStream
 import java.nio.ByteBuffer
 
+/**
+ * Represent a single frame
+ * Wrap a readable to InputStream for BitmapFactory.decodeStream
+ */
 class APngFrameStream(
     header: IHDRChunk,
     rawFrameData: RawFrameData,

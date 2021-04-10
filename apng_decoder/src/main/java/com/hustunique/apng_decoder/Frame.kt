@@ -21,11 +21,17 @@ import android.graphics.Bitmap
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
+/**
+ * Represent a frame draw on [Canvas]
+ */
 data class Frame(
     val image: Bitmap,
     val options: FrameOptions
 )
 
+/**
+ * Frame rendering options extracts from [FCTLChunk]
+ */
 data class FrameOptions(
     val width: Int,
     val height: Int,

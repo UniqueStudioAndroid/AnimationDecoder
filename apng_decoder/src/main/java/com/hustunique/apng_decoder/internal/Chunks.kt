@@ -1,6 +1,6 @@
 @file:Suppress("EXPERIMENTAL_API_USAGE")
 
-package com.hustunique.apng_decoder
+package com.hustunique.apng_decoder.internal
 
 /**
  * Copyright (C) 2021 little-csd
@@ -21,9 +21,17 @@ package com.hustunique.apng_decoder
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
+import com.hustunique.apng_decoder.FrameOptions
+import com.hustunique.apng_decoder.Readable
+import com.hustunique.apng_decoder.asReadable
 import java.nio.ByteBuffer
 import java.util.zip.CRC32
 
+/**
+ * Base Chunk for all chunk types
+ * Consists of four parts (sequentially):
+ * [dataLen], [type], actual data, [crc]
+ */
 open class BaseChunk(val buffer: ByteBuffer) {
 
     companion object {}
@@ -40,6 +48,10 @@ open class BaseChunk(val buffer: ByteBuffer) {
     val chunkName: String
         get() = String(ByteBuffer.allocate(4).putInt(type).array())
 
+    /**
+     * Compute CRC for current chunk
+     * Used for check whether [crc] is valid (if needed)
+     */
     fun computeCRC(): Int {
         val crcEngine = CRC32()
         ByteBuffer.allocate(4).putInt(type).array().forEach {
@@ -49,6 +61,11 @@ open class BaseChunk(val buffer: ByteBuffer) {
         return crcEngine.value.toInt()
     }
 
+    /**
+     * Read byte/short/int from [buffer] at [index]
+     *
+     * @return data that cast to [Int]
+     */
     protected fun readAt(index: Int, len: Int = 4): Int {
         val position = buffer.position()
         buffer.position(index)
@@ -61,6 +78,11 @@ open class BaseChunk(val buffer: ByteBuffer) {
         return value
     }
 
+    /**
+     * Translate BaseChunk object to a READ ONLY [Readable]
+     *
+     * NOTE: make a copy of buffer here in order to support parallel reading
+     */
     open fun asReadable() = object : Readable {
         private val readOnlyBuffer = buffer
             .duplicate()
@@ -90,12 +112,20 @@ class FDATChunk(buffer: ByteBuffer) : BaseChunk(buffer) {
     override val dataLen: Int
         get() = super.dataLen - 4
 
+    /**
+     * Pretend that I am IDAT chunk,
+     * so system's bitmap decoder can recognize me
+     */
     override val type: Int
         get() = PngChunkType.TYPE_IDAT
 
     override val crc: Int
         get() = innerCRC
 
+    /**
+     * Because of changing [type] and skip first 4 byte,
+     * we need to compute crc again
+     */
     private val innerCRC = let {
         val crcEngine = CRC32()
         ByteBuffer.allocate(4).putInt(type).array().forEach {
@@ -105,6 +135,11 @@ class FDATChunk(buffer: ByteBuffer) : BaseChunk(buffer) {
         crcEngine.value.toInt()
     }
 
+    /**
+     * Translate FDATChunk object to a READ ONLY [Readable]
+     *
+     * NOTE: make a copy of buffer here in order to support parallel reading
+     */
     override fun asReadable() =
         listOf(
             dataLen.asReadable(),

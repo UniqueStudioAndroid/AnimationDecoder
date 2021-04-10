@@ -20,6 +20,8 @@ package com.hustunique.apng_decoder
  */
 
 import android.graphics.BitmapFactory
+import com.hustunique.apng_decoder.internal.APngFrameStream
+import com.hustunique.apng_decoder.internal.APngObject
 import java.nio.ByteBuffer
 import kotlin.jvm.Throws
 

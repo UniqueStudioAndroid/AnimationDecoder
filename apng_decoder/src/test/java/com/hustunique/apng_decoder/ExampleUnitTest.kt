@@ -1,5 +1,6 @@
 package com.hustunique.apng_decoder
 
+import com.hustunique.apng_decoder.internal.APngObject
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import java.io.File
