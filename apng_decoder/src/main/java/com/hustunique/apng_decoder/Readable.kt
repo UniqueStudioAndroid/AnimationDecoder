@@ -1,7 +1,7 @@
 package com.hustunique.apng_decoder
 
 /**
- * Copyright (C) 2021 little-csd
+ * Copyright (C) 2021 xiaoyuxuan
  * All rights reserved.
  *
  * This library is free software; you can redistribute it and/or
@@ -19,33 +19,31 @@ package com.hustunique.apng_decoder
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-import java.io.InputStream
-import java.nio.ByteBuffer
 
-class APngFrameStream(
-    header: IHDRChunk,
-    frameData: FrameData,
-    others: List<BaseChunk>
-) :
-    InputStream() {
+interface Readable {
 
-    companion object {
-        private val SIGNATURE = ByteBuffer.allocate(8).putLong(APngObject.PNG_SIGNATURE)
-    }
+    fun read(): Byte
 
-    private val readableChunkList = mutableListOf<Readable>().apply {
-        add(BaseChunk(SIGNATURE.asReadOnlyBuffer()))
-        add(header)
-        addAll(frameData.chunks)
-        addAll(others)
-    }.asReadable()
+    fun size(): Int
 
-
-    override fun read(): Int = readableChunkList.read().toInt()
 }
 
+internal fun List<Readable>.asReadable(): Readable = object : Readable {
+    private val readableSizeList = this@asReadable.map { it.size() }.runningReduce { acc, i ->
+        acc + i
+    }
 
-fun APngObject.frameDataStream(frameIndex: Int): APngFrameStream {
-    check(frameIndex < frameSize())
-    return APngFrameStream(getHeader(), getFrame(frameIndex), getOthersChunk())
+    private var curPos = 0
+
+    private var curReadableIdx = 0
+
+    private var curChunk = this@asReadable[curReadableIdx]
+    override fun read(): Byte {
+        curChunk = if (curPos++ < readableSizeList[curReadableIdx - 1]) curChunk
+        else this@asReadable[curReadableIdx++]
+        return curChunk.read()
+    }
+
+    override fun size(): Int = readableSizeList.last()
+
 }

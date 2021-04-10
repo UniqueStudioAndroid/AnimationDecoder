@@ -22,14 +22,14 @@ import java.nio.ByteBuffer
  */
 
 class APngObject(data: ByteBuffer) {
-    private var header: IHDRChunk? = null
+    private lateinit var header: IHDRChunk
     private var actl: ACTLChunk? = null
     private val frames = ArrayList<FrameData>()
     private val others = ArrayList<BaseChunk>()
     private var frame: FrameData? = null
 
     companion object {
-        private const val PNG_SIGNATURE = (0x89_50_4E_47 shl 32) + 0x0D_0A_1A_0A
+        const val PNG_SIGNATURE = (0x89_50_4E_47 shl 32) + 0x0D_0A_1A_0A
     }
 
     init {
@@ -38,8 +38,19 @@ class APngObject(data: ByteBuffer) {
             val chunk = readAndUnBox(data)
             process(chunk)
         }
+        check(this::header.isInitialized) {
+            "Png file has no IHDRChunk"
+        }
         frame?.apply { frames.add(this) }
     }
+
+    fun getFrame(index: Int): FrameData = frames[index]
+
+    fun frameSize() = frames.size
+
+    fun getOthersChunk(): List<BaseChunk> = others
+
+    fun getHeader(): IHDRChunk = header
 
     private fun readAndCheckSignature(data: ByteBuffer) {
         val signature = data.long
@@ -64,7 +75,6 @@ class APngObject(data: ByteBuffer) {
         println(chunk)
         when (chunk) {
             is IHDRChunk -> {
-                check(header == null) { "Two IHDR Chunk" }
                 header = chunk
             }
             is ACTLChunk -> {
