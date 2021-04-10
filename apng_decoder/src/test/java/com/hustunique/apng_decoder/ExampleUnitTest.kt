@@ -13,6 +13,14 @@ import java.util.zip.CRC32
  * See [testing documentation](http://d.android.com/tools/testing).
  */
 class ExampleUnitTest {
+
+    companion object {
+        const val TEST_PNG_BASE = "test_png/"
+        const val TEST_ELEPHANT = "${TEST_PNG_BASE}elephant.png"
+
+        const val TEST_TMP_BASE = "test_tmp/"
+    }
+
     @Test
     fun addition_isCorrect() {
         assertEquals(4, 2 + 2)
@@ -20,10 +28,10 @@ class ExampleUnitTest {
 
     @Test
     fun run() {
-        val file = File("elephant.png")
+        val file = File(TEST_ELEPHANT)
         val decoder = APngDecoder()
         val input = decoder.decode(ByteBuffer.wrap(file.readBytes()))
-        val file2 = File("elephant2.png")
+        val file2 = File("${TEST_TMP_BASE}elephant2.png")
         if (file2.exists()) {
             file2.delete()
             file2.createNewFile()
@@ -35,7 +43,7 @@ class ExampleUnitTest {
 
     @Test
     fun testTrunkCRCInFile() {
-        val data = File("elephant2.png").readBytes()
+        val data = File("${TEST_TMP_BASE}elephant2.png").readBytes()
         val data2 = ByteArray(data.size - 8)
         data.copyInto(data2, 0, 4, data.size - 4)
         val crc = CRC32().apply {
@@ -51,7 +59,7 @@ class ExampleUnitTest {
 
     @Test
     fun testCRC2() {
-        val data = ByteBuffer.wrap(File("elephant.png").readBytes())
+        val data = ByteBuffer.wrap(File(TEST_ELEPHANT).readBytes())
         val obj = APngObject(data)
         val frame = obj.getFrame(1)
         frame.chunks.forEach {
