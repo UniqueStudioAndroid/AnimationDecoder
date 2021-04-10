@@ -19,8 +19,6 @@ package com.hustunique.apng_decoder.internal
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-import com.hustunique.apng_decoder.Readable
-import com.hustunique.apng_decoder.asReadable
 import java.io.InputStream
 import java.nio.ByteBuffer
 

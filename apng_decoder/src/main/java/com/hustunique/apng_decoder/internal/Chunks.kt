@@ -22,8 +22,6 @@ package com.hustunique.apng_decoder.internal
  */
 
 import com.hustunique.apng_decoder.FrameOptions
-import com.hustunique.apng_decoder.Readable
-import com.hustunique.apng_decoder.asReadable
 import java.nio.ByteBuffer
 import java.util.zip.CRC32
 
