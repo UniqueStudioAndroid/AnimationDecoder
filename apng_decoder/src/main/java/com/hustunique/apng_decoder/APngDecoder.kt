@@ -31,9 +31,7 @@ class APngDecoder {
     @Throws(IllegalStateException::class)
     fun decode(data: ByteBuffer) : InputStream {
         val obj = APngObject(data)
-
         return obj.frameDataStream(1)
-
 //        return try {
 //            BitmapFactory.decodeStream(stream)
 //        } catch (e: Exception) {
