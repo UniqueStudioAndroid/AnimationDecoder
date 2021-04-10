@@ -29,35 +29,33 @@ open class BaseChunk(
 ) : Readable {
     companion object {}
 
-    open val length: Int
+    open val dataLen: Int
         get() = readAt(0)
 
     open val type: Int
         get() = readAt(4)
 
     open val crc: Int
-        get() = readAt(length + 8)
+        get() = readAt(dataLen + 8)
 
     val chunkName: String
         get() = String(ByteBuffer.allocate(4).putInt(type).array())
 
     override fun read(): Byte = readOnlyBuffer.get()
 
-    override fun size(): Int = length + 12
+    override fun available(): Int = dataLen + 12
 
     override fun toString(): String {
-        return "${chunkName}(length: $length)"
+        return "${chunkName}(length: $dataLen)"
     }
-
-    open fun read() = readOnlyBuffer.get()
 }
 
 class IHDRChunk(readOnlyBuffer: ByteBuffer) : BaseChunk(readOnlyBuffer)
 
 class FDATChunk(readOnlyBuffer: ByteBuffer) : BaseChunk(readOnlyBuffer) {
 
-    override val length: Int
-        get() = super.length - 4
+    override val dataLen: Int
+        get() = super.dataLen - 4
 
     override val type: Int
         get() = PngChunkType.TYPE_IDAT
@@ -67,24 +65,27 @@ class FDATChunk(readOnlyBuffer: ByteBuffer) : BaseChunk(readOnlyBuffer) {
 
     private val innerCRC: Int
 
+    private val readable by lazy {
+        listOf(
+            dataLen.asReadable(),
+            type.asReadable(),
+            readOnlyBuffer.asReadable(12),
+            crc.asReadable(),
+        ).asReadable()
+    }
+
     init {
         val crcEngine = CRC32()
         crcEngine.update(type)
-        crcEngine.update(readOnlyBuffer.array(), 12, length)
+        crcEngine.update(readOnlyBuffer.array(), 12, dataLen)
         innerCRC = crcEngine.value.toInt()
     }
 
     override fun toString(): String {
-        return "fdAT(length: $length)"
+        return "fdAT(length: $dataLen)"
     }
 
-    private var position = 0
-    override fun read() : Byte {
-        val len = length
-        if (position in 8 until len)
-        position++
-        return readByteInInt(position - length - 12, )
-    }
+    override fun read(): Byte = readable.read()
 }
 
 class ACTLChunk(readOnlyBuffer: ByteBuffer) : BaseChunk(readOnlyBuffer)
@@ -105,7 +106,7 @@ internal fun BaseChunk.Companion.makeChunk(
     else -> BaseChunk(readOnlyBuffer)
 }
 
-internal fun BaseChunk.readAt(index: Int) : Int {
+internal fun BaseChunk.readAt(index: Int): Int {
     val position = readOnlyBuffer.position()
     readOnlyBuffer.position(index)
     val value = readOnlyBuffer.int

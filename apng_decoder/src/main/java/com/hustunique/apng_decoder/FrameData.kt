@@ -1,7 +1,7 @@
 package com.hustunique.apng_decoder
 
 /**
- * Copyright (C) 2021 Ski
+ * Copyright (C) 2021 little-csd
  * All rights reserved.
  *
  * This library is free software; you can redistribute it and/or

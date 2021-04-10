@@ -3,6 +3,7 @@ package com.hustunique.myapplication
 import android.graphics.BitmapFactory
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import com.hustunique.apng_decoder.APngDecoder
 import com.hustunique.apng_decoder.AnimatedImageDrawable
 import com.hustunique.myapplication.databinding.ActivityMainBinding
 import java.nio.ByteBuffer
@@ -18,9 +19,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun initView() {
-        val buffer = ByteBuffer.wrap(assets.open("elephant.png").readBytes()).array()
-        val bm = BitmapFactory.decodeByteArray(buffer, 0, buffer.size)
-        val d = AnimatedImageDrawable(listOf(bm))
+        val buffer = ByteBuffer.wrap(assets.open("elephant.png").readBytes())
+//        val bm = BitmapFactory.decodeByteArray(buffer, 0, buffer.size)
+        val bm = APngDecoder().decode(buffer)
+        val d = AnimatedImageDrawable(listOf(bm!!))
         binding.img.setImageDrawable(d)
         binding.button.setOnClickListener {
             if (d.isRunning) {

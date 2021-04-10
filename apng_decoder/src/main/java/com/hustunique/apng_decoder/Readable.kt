@@ -1,5 +1,7 @@
 package com.hustunique.apng_decoder
 
+import java.nio.ByteBuffer
+
 /**
  * Copyright (C) 2021 xiaoyuxuan
  * All rights reserved.
@@ -24,26 +26,55 @@ interface Readable {
 
     fun read(): Byte
 
-    fun size(): Int
-
+    fun available(): Int
 }
 
 internal fun List<Readable>.asReadable(): Readable = object : Readable {
-    private val readableSizeList = this@asReadable.map { it.size() }.runningReduce { acc, i ->
-        acc + i
-    }
 
     private var curPos = 0
 
     private var curReadableIdx = 0
 
-    private var curChunk = this@asReadable[curReadableIdx]
+    private var curChunk = this@asReadable[curReadableIdx++]
+
+    private val readableSizeList = this@asReadable.map { it.available() }.runningReduce { acc, i ->
+        acc + i
+    }
+
     override fun read(): Byte {
         curChunk = if (curPos++ < readableSizeList[curReadableIdx - 1]) curChunk
         else this@asReadable[curReadableIdx++]
         return curChunk.read()
     }
 
-    override fun size(): Int = readableSizeList.last()
-
+    override fun available(): Int = readableSizeList.last() - curPos
 }
+
+/**
+ * Translate Int object to a Readable
+ * (Default byte order is BitEndian)
+*/
+internal fun Int.asReadable(isBigEndian: Boolean = true): Readable = object : Readable {
+    private var curIndex = 0
+
+    override fun read(): Byte {
+        val idx = if (isBigEndian) curIndex else 4 - curIndex
+        return ((this@asReadable ushr idx * 8) and 0xFF).toByte()
+    }
+
+    override fun available(): Int {
+        return 4 - curIndex
+    }
+}
+
+internal fun ByteBuffer.asReadable(offset: Int = 0): Readable = object : Readable {
+    private val readByteBuffer = this@asReadable.let {
+        it.position(offset)
+        it.slice()
+    }
+
+    override fun read(): Byte = readByteBuffer.get()
+
+    override fun available(): Int = readByteBuffer.remaining()
+}
+

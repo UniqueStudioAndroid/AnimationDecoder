@@ -3,7 +3,7 @@ package com.hustunique.apng_decoder
 import java.nio.ByteBuffer
 
 /**
- * Copyright (C) 2021 Ski
+ * Copyright (C) 2021 little-csd
  * All rights reserved.
  *
  * This library is free software; you can redistribute it and/or
@@ -65,14 +65,13 @@ class APngObject(data: ByteBuffer) {
         val chunk =
             BaseChunk.makeChunk(
                 type,
-                ByteBuffer.wrap(box.array(), pos, chunkLen).slice().asReadOnlyBuffer()
+                ByteBuffer.wrap(box.array(), pos, chunkLen).slice()//.asReadOnlyBuffer()
             )
         box.position(pos + chunkLen)
         return chunk
     }
 
     private fun process(chunk: BaseChunk) {
-        println(chunk)
         when (chunk) {
             is IHDRChunk -> {
                 header = chunk

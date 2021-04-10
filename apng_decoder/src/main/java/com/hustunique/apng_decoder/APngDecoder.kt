@@ -19,21 +19,24 @@ package com.hustunique.apng_decoder
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import java.lang.Exception
 import java.nio.ByteBuffer
 import kotlin.jvm.Throws
 
 class APngDecoder {
 
     @Throws(IllegalStateException::class)
-    fun decode(data: ByteBuffer) {
+    fun decode(data: ByteBuffer) : Bitmap? {
         val obj = APngObject(data)
+        val stream = obj.frameDataStream(0)
+
+        return try {
+            BitmapFactory.decodeStream(stream)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
     }
 }
-
-// signature
-// acTL
-// IDAT
-// fcTL
-// fDAT
-// ...
-// IEND

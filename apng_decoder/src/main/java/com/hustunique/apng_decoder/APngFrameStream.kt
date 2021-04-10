@@ -34,7 +34,7 @@ class APngFrameStream(
     }
 
     private val readableChunkList = mutableListOf<Readable>().apply {
-        add(BaseChunk(SIGNATURE.asReadOnlyBuffer()))
+        add(SIGNATURE.asReadOnlyBuffer().asReadable())
         add(header)
         addAll(frameData.chunks)
         addAll(others)
@@ -42,6 +42,8 @@ class APngFrameStream(
 
 
     override fun read(): Int = readableChunkList.read().toInt()
+
+    override fun available(): Int = readableChunkList.available()
 }
 
 
