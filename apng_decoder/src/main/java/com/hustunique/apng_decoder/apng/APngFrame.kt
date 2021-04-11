@@ -1,5 +1,8 @@
 package com.hustunique.apng_decoder
 
+import android.graphics.Bitmap
+import com.hustunique.apng_decoder.core.Frame
+
 /**
  * Copyright (C) 2021 xiaoyuxuan
  * All rights reserved.
@@ -19,29 +22,36 @@ package com.hustunique.apng_decoder
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-object Config {
-    const val TEST_PNG_BASE = "test_png/"
-    const val TEST_ELEPHANT = "${TEST_PNG_BASE}elephant.png"
+/**
+ * Represent a frame draw on [Canvas]
+ */
+class APngFrame(
+    image: Bitmap,
+    val options: ApngFrameOptions
+) : Frame(image)
 
-    const val TEST_TMP_BASE = "test_tmp/"
-}
-
-object TestSets {
-
-    val testSetBeanList = mutableListOf<TestSetBean>()
-
+/**
+ * Frame rendering options extracts from [FCTLChunk]
+ */
+data class ApngFrameOptions(
+    val width: Int,
+    val height: Int,
+    val xOffset: Int,
+    val yOffset: Int,
+    val delayInMillis: Long,
+    val disposeOp: Byte,
+    val blendOp: Byte
+) {
     init {
-        for (i in 0..3) {
-            testSetBeanList += TestSetBean(
-                "${Config.TEST_PNG_BASE}${String.format("%03d", i)}.png",
-                true
-            )
+        check(disposeOp < 3) {
+            "error png format(disposeOp out of range)"
+        }
+        check(blendOp < 2) {
+            "error png format(blendOp out of range)"
         }
     }
 
-}
+    val xOffsetF: Float = xOffset.toFloat()
 
-data class TestSetBean(
-    val path: String,
-    val valid: Boolean
-)
+    val yOffsetF: Float = yOffset.toFloat()
+}

@@ -1,7 +1,7 @@
-package com.hustunique.apng_decoder.internal
+package com.hustunique.apng_decoder.util
 
 /**
- * Copyright (C) 2021 little-csd
+ * Copyright (C) 2021 xiaoyuxuan
  * All rights reserved.
  *
  * This library is free software; you can redistribute it and/or
@@ -18,12 +18,3 @@ package com.hustunique.apng_decoder.internal
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
-
-/**
- * Data class that represents a undecoded frame.
- * Consists of [FCTLChunk] (Frame Control Chunk) and a list of IDAT/fdAT Chunk
- */
-data class RawFrameData(
-    val fctl: FCTLChunk,
-    val chunks: ArrayList<BaseChunk>
-)

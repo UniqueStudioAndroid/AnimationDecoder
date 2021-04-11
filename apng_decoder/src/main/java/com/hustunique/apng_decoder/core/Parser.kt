@@ -1,6 +1,6 @@
-package com.hustunique.apng_decoder
+package com.hustunique.apng_decoder.core
 
-import android.graphics.Bitmap
+import java.nio.ByteBuffer
 
 /**
  * Copyright (C) 2021 xiaoyuxuan
@@ -21,36 +21,10 @@ import android.graphics.Bitmap
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-/**
- * Represent a frame draw on [Canvas]
- */
-data class Frame(
-    val image: Bitmap,
-    val options: FrameOptions
-)
+interface Parser {
 
-/**
- * Frame rendering options extracts from [FCTLChunk]
- */
-data class FrameOptions(
-    val width: Int,
-    val height: Int,
-    val xOffset: Int,
-    val yOffset: Int,
-    val delayInMillis: Long,
-    val disposeOp: Byte,
-    val blendOp: Byte
-) {
-    init {
-        check(disposeOp < 3) {
-            "error png format(disposeOp out of range)"
-        }
-        check(blendOp < 2) {
-            "error png format(blendOp out of range)"
-        }
-    }
+    fun parse(data: ByteBuffer): Decodable
 
-    val xOffsetF: Float = xOffset.toFloat()
+    fun handles(data: ByteBuffer): Boolean
 
-    val yOffsetF: Float = yOffset.toFloat()
 }

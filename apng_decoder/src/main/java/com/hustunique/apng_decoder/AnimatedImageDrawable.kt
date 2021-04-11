@@ -40,7 +40,7 @@ class AnimatedImageDrawable() : Drawable(), Animatable {
     @Volatile
     private var mRunning = false
 
-    private var mFrameList: List<Frame>? = null
+    private var mAPngFrameList: List<APngFrame>? = null
 
     private var mCurIdx = 0
 
@@ -52,8 +52,8 @@ class AnimatedImageDrawable() : Drawable(), Animatable {
         }
     }
 
-    constructor(frameList: List<Frame>) : this() {
-        this.mFrameList = frameList
+    constructor(APngFrameList: List<APngFrame>) : this() {
+        this.mAPngFrameList = APngFrameList
     }
 
     override fun draw(canvas: Canvas) {
@@ -61,7 +61,7 @@ class AnimatedImageDrawable() : Drawable(), Animatable {
             mStarting = false
             mRunning = true
         }
-        mFrameList?.let {
+        mAPngFrameList?.let {
             it[mCurIdx++ % it.size]
         }?.run {
             options.run {

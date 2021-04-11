@@ -1,5 +1,8 @@
-package com.hustunique.apng_decoder.internal
+package com.hustunique.apng_decoder.apng
 
+import com.hustunique.apng_decoder.core.Decodable
+import com.hustunique.apng_decoder.core.Parser
+import com.hustunique.apng_decoder.internal.*
 import java.nio.ByteBuffer
 
 /**
@@ -24,36 +27,12 @@ import java.nio.ByteBuffer
 /**
  * Represent a png file, extract from [data]
  */
-class APngObject(data: ByteBuffer) {
-    private lateinit var header: IHDRChunk
-    private var actl: ACTLChunk? = null
-    private val frames = ArrayList<RawFrameData>()
-    private val others = ArrayList<BaseChunk>()
+class APngParser() : Parser {
     private var rawFrame: RawFrameData? = null
 
     companion object {
         const val PNG_SIGNATURE = (0x89_50_4E_47 shl 32) + 0x0D_0A_1A_0A
     }
-
-    init {
-        readAndCheckSignature(data)
-        while (data.remaining() > 0) {
-            val chunk = readAndUnBox(data)
-            process(chunk)
-        }
-        check(this::header.isInitialized) {
-            "Png file has no IHDRChunk"
-        }
-        rawFrame?.apply { frames.add(this) }
-    }
-
-    fun getFrame(index: Int): RawFrameData = frames[index]
-
-    fun getFrames(): List<RawFrameData> = frames
-
-    fun getOthersChunk(): List<BaseChunk> = others
-
-    fun getHeader(): IHDRChunk = header
 
     private fun readAndCheckSignature(data: ByteBuffer) {
         val signature = data.long
@@ -74,18 +53,16 @@ class APngObject(data: ByteBuffer) {
         return chunk
     }
 
-    private fun process(chunk: BaseChunk) {
+    private fun process(builder: APngDecodable.Builder, chunk: BaseChunk) {
         when (chunk) {
             is IHDRChunk -> {
-                header = chunk
+                builder.setHeader(chunk)
             }
             is ACTLChunk -> {
-                check(actl == null) { "Two acTL Chunk" }
-                actl = chunk
+                builder.setACTL(chunk)
             }
             is FCTLChunk -> {
-                check(this::header.isInitialized) { "Header not initialized" }
-                rawFrame?.apply { frames.add(this) }
+                rawFrame?.apply { builder.addFrame(this) }
                 rawFrame = RawFrameData(chunk, ArrayList())
             }
             is FDATChunk -> {
@@ -93,7 +70,29 @@ class APngObject(data: ByteBuffer) {
                 rawFrame?.chunks?.add(chunk)
             }
             is IDATChunk -> rawFrame?.chunks?.add(chunk)
-            else -> others.add(chunk)
+            else -> builder.addOthers(chunk)
         }
+    }
+
+    override fun handles(data: ByteBuffer): Boolean {
+        return true
+    }
+
+    override fun parse(data: ByteBuffer): Decodable {
+        reset()
+        readAndCheckSignature(data)
+        val aPngParsedObjectBuilder = APngDecodable.Builder()
+        while (data.remaining() > 0) {
+            val chunk = readAndUnBox(data)
+            process(aPngParsedObjectBuilder, chunk)
+        }
+        rawFrame?.let {
+            aPngParsedObjectBuilder.addFrame(it)
+        }
+        return aPngParsedObjectBuilder.build()
+    }
+
+    private fun reset() {
+        rawFrame = null
     }
 }

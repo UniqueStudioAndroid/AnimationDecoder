@@ -21,7 +21,10 @@ package com.hustunique.apng_decoder.internal
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-import com.hustunique.apng_decoder.FrameOptions
+import com.hustunique.apng_decoder.ApngFrameOptions
+import com.hustunique.apng_decoder.apng.PngChunkType
+import com.hustunique.apng_decoder.core.Readable
+import com.hustunique.apng_decoder.core.asReadable
 import java.nio.ByteBuffer
 import java.util.zip.CRC32
 
@@ -32,7 +35,8 @@ import java.util.zip.CRC32
  */
 open class BaseChunk(val buffer: ByteBuffer) {
 
-    companion object {}
+    // We want to discard ';' here, but the stupid compiler complains about it
+    companion object;
 
     open val dataLen: Int
         get() = readAt(0)
@@ -124,7 +128,7 @@ class FDATChunk(buffer: ByteBuffer) : BaseChunk(buffer) {
      * Because of changing [type] and skip first 4 byte,
      * we need to compute crc again
      */
-    private val innerCRC = let {
+    private val innerCRC by lazy {
         val crcEngine = CRC32()
         ByteBuffer.allocate(4).putInt(type).array().forEach {
             crcEngine.update(it.toInt())
@@ -169,8 +173,8 @@ class FCTLChunk(buffer: ByteBuffer) : BaseChunk(buffer) {
     val disposeOp = readAt(32, 1).toByte()
     val blendOp = readAt(33, 1).toByte()
 
-    fun toFrameOptions(): FrameOptions =
-        FrameOptions(width, height, xOffset, yOffset, delayed, disposeOp, blendOp = blendOp)
+    fun toFrameOptions(): ApngFrameOptions =
+        ApngFrameOptions(width, height, xOffset, yOffset, delayed, disposeOp, blendOp = blendOp)
 
     override fun toString(): String {
         return super.toString() + " size = ($width, $height), offset = ($xOffset, $yOffset)"

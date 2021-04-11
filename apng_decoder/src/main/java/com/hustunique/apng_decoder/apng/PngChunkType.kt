@@ -1,7 +1,7 @@
-package com.hustunique.apng_decoder
+package com.hustunique.apng_decoder.apng
 
 /**
- * Copyright (C) 2021 xiaoyuxuan
+ * Copyright (C) 2021 little-csd
  * All rights reserved.
  *
  * This library is free software; you can redistribute it and/or
@@ -19,29 +19,13 @@ package com.hustunique.apng_decoder
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-object Config {
-    const val TEST_PNG_BASE = "test_png/"
-    const val TEST_ELEPHANT = "${TEST_PNG_BASE}elephant.png"
-
-    const val TEST_TMP_BASE = "test_tmp/"
+internal object PngChunkType {
+    const val TYPE_IHDR = 0x49484452
+    const val TYPE_IDAT = 0x49444154
+    const val TYPE_IEND = 0x49454E44
+    const val TYPE_PLTE = 0x504C5445
+    const val TYPE_ACTL = 0x6163544C
+    const val TYPE_FCTL = 0x6663544C
+    const val TYPE_FDAT = 0x66644154
+    const val TYPE_TEXT = 0x74455874
 }
-
-object TestSets {
-
-    val testSetBeanList = mutableListOf<TestSetBean>()
-
-    init {
-        for (i in 0..3) {
-            testSetBeanList += TestSetBean(
-                "${Config.TEST_PNG_BASE}${String.format("%03d", i)}.png",
-                true
-            )
-        }
-    }
-
-}
-
-data class TestSetBean(
-    val path: String,
-    val valid: Boolean
-)

@@ -1,4 +1,4 @@
-package com.hustunique.apng_decoder.internal
+package com.hustunique.apng_decoder.core
 
 import java.nio.BufferUnderflowException
 import java.nio.ByteBuffer
@@ -105,3 +105,9 @@ internal fun ByteBuffer.asReadable(offset: Int = 0, size: Int = capacity()): Rea
 
         override fun available(): Int = readByteBuffer.remaining()
     }
+
+@OptIn(ExperimentalStdlibApi::class)
+fun readable(builderAction: MutableList<Readable>.() -> Unit): Readable =
+    buildList(builderAction).asReadable()
+
+fun Readable.asStream() = ReadableStream(this)

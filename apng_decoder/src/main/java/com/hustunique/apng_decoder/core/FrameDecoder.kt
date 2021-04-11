@@ -1,7 +1,10 @@
-package com.hustunique.apng_decoder
+package com.hustunique.apng_decoder.core
+
+import android.graphics.Bitmap
+import java.io.InputStream
 
 /**
- * Copyright (C) 2021 little-csd
+ * Copyright (C) 2021 xiaoyuxuan
  * All rights reserved.
  *
  * This library is free software; you can redistribute it and/or
@@ -19,22 +22,10 @@ package com.hustunique.apng_decoder
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-import android.graphics.BitmapFactory
-import com.hustunique.apng_decoder.internal.APngFrameStream
-import com.hustunique.apng_decoder.internal.APngObject
-import java.nio.ByteBuffer
-import kotlin.jvm.Throws
+interface FrameDecoder {
 
-class APngDecoder {
+    fun decode(inStream: InputStream): Bitmap
 
-    @Throws(IllegalStateException::class, IllegalArgumentException::class)
-    fun decode(data: ByteBuffer): List<Frame> {
-        val obj = APngObject(data)
-        return obj.getFrames()
-            .map {
-                val stream = APngFrameStream(obj.getHeader(), it, obj.getOthersChunk())
-                Frame(BitmapFactory.decodeStream(stream), it.fctl.toFrameOptions())
-            }
-            .toList()
-    }
 }
+
+typealias DecodeAction = (InputStream) -> Bitmap

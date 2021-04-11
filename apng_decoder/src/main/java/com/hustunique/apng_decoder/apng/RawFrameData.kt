@@ -1,7 +1,10 @@
-package com.hustunique.apng_decoder
+package com.hustunique.apng_decoder.apng
+
+import com.hustunique.apng_decoder.internal.BaseChunk
+import com.hustunique.apng_decoder.internal.FCTLChunk
 
 /**
- * Copyright (C) 2021 xiaoyuxuan
+ * Copyright (C) 2021 little-csd
  * All rights reserved.
  *
  * This library is free software; you can redistribute it and/or
@@ -19,29 +22,11 @@ package com.hustunique.apng_decoder
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-object Config {
-    const val TEST_PNG_BASE = "test_png/"
-    const val TEST_ELEPHANT = "${TEST_PNG_BASE}elephant.png"
-
-    const val TEST_TMP_BASE = "test_tmp/"
-}
-
-object TestSets {
-
-    val testSetBeanList = mutableListOf<TestSetBean>()
-
-    init {
-        for (i in 0..3) {
-            testSetBeanList += TestSetBean(
-                "${Config.TEST_PNG_BASE}${String.format("%03d", i)}.png",
-                true
-            )
-        }
-    }
-
-}
-
-data class TestSetBean(
-    val path: String,
-    val valid: Boolean
+/**
+ * Data class that represents a undecoded frame.
+ * Consists of [FCTLChunk] (Frame Control Chunk) and a list of IDAT/fdAT Chunk
+ */
+data class RawFrameData(
+    val fctl: FCTLChunk,
+    val chunks: ArrayList<BaseChunk>
 )

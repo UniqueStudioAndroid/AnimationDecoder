@@ -1,4 +1,6 @@
-package com.hustunique.apng_decoder
+package com.hustunique.apng_decoder.core
+
+import java.io.InputStream
 
 /**
  * Copyright (C) 2021 xiaoyuxuan
@@ -19,29 +21,12 @@ package com.hustunique.apng_decoder
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-object Config {
-    const val TEST_PNG_BASE = "test_png/"
-    const val TEST_ELEPHANT = "${TEST_PNG_BASE}elephant.png"
+class ReadableStream(private val readable: Readable) : InputStream() {
 
-    const val TEST_TMP_BASE = "test_tmp/"
+    @ExperimentalUnsignedTypes
+    override fun read() =
+        if (readable.available() > 0) readable.read().toUByte().toInt()
+        else -1
+
+    override fun available(): Int = readable.available()
 }
-
-object TestSets {
-
-    val testSetBeanList = mutableListOf<TestSetBean>()
-
-    init {
-        for (i in 0..3) {
-            testSetBeanList += TestSetBean(
-                "${Config.TEST_PNG_BASE}${String.format("%03d", i)}.png",
-                true
-            )
-        }
-    }
-
-}
-
-data class TestSetBean(
-    val path: String,
-    val valid: Boolean
-)
