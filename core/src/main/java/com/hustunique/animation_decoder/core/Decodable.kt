@@ -1,5 +1,7 @@
 package com.hustunique.animation_decoder.core
 
+import com.hustunique.animation_decoder.api.Frame
+
 /**
  * Copyright (C) 2021 xiaoyuxuan
  * All rights reserved.
@@ -19,8 +21,8 @@ package com.hustunique.animation_decoder.core
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-interface Decodable {
+interface Decodable<DT> {
 
-    fun createFrames(decodeAction: DecodeAction): List<Frame>
+    fun createFrames(decodeAction: DecodeAction<DT>): List<Frame<DT>>
 
 }

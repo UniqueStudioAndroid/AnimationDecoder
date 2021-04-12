@@ -1,5 +1,4 @@
-package com.hustunique.animation_decoder.core
-
+package com.hustunique.animation_decoder.core.exceptions
 
 /**
  * Copyright (C) 2021 xiaoyuxuan
@@ -20,4 +19,5 @@ package com.hustunique.animation_decoder.core
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-open class Frame(val image: Drawable)
+class DecodeFailException : Exception("AnimationDecoder: decode frame error"){
+}

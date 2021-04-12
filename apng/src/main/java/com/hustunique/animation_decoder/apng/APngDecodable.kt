@@ -1,6 +1,8 @@
 package com.hustunique.animation_decoder.apng
 
+import com.hustunique.animation_decoder.api.Frame
 import com.hustunique.animation_decoder.core.*
+import com.hustunique.animation_decoder.core.exceptions.DecodeFailException
 import java.nio.ByteBuffer
 
 /**
@@ -22,17 +24,17 @@ import java.nio.ByteBuffer
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-class APngDecodable constructor(
+class APngDecodable<DT> constructor(
     header: IHDRChunk,
     val actl: ACTLChunk?,
     defaultFrame: List<IDATChunk>,
     val frames: List<RawFrameData>,
     others: List<BaseChunk>
-) : PngDecodable(header, defaultFrame, others) {
+) : PngDecodable<DT>(header, defaultFrame, others) {
 
 
-    override fun createFrames(decodeAction: DecodeAction) = frames.map { frameData ->
-        APngFrame(
+    override fun createFrames(decodeAction: DecodeAction<DT>) = frames.map { frameData ->
+        APngFrame<DT>(
             decodeAction(
                 readable {
                     add(SIGNATURE.asReadable())
@@ -40,12 +42,12 @@ class APngDecodable constructor(
                     addAll(frameData.chunks.map { it.asReadable() })
                     addAll(others.map { it.asReadable() })
                 }.asStream()
-            ),
+            ) ?: throw DecodeFailException(),
             frameData.fctl.toFrameOptions()
         )
     }
 
-    class Builder {
+    class Builder<DT> {
 
         private var header: IHDRChunk? = null
         private var actl: ACTLChunk? = null
@@ -69,7 +71,7 @@ class APngDecodable constructor(
 
         fun addOthers(othersChunk: BaseChunk) = apply { others.add(othersChunk) }
 
-        fun build(): PngDecodable {
+        fun build(): PngDecodable<DT> {
             check(header != null) {
                 "Png file has no IHDRChunk"
             }
@@ -82,22 +84,22 @@ class APngDecodable constructor(
     }
 }
 
-open class PngDecodable constructor(
+open class PngDecodable<DT> constructor(
     val header: IHDRChunk,
     val defaultFrame: List<IDATChunk>,
     val others: List<BaseChunk>
-) : Decodable {
+) : Decodable<DT> {
 
     companion object {
         val SIGNATURE = ByteBuffer.allocate(8).putLong(APngParser.PNG_SIGNATURE)
     }
 
-    override fun createFrames(decodeAction: DecodeAction) =
-        listOf(Frame(decodeAction(readable {
+    override fun createFrames(decodeAction: DecodeAction<DT>) =
+        listOf(Frame<DT>(decodeAction(readable {
             add(SIGNATURE.asReadable())
             add(header.asReadable())
             addAll(defaultFrame.map { it.asReadable() })
             addAll(others.map { it.asReadable() })
-        }.asStream())))
+        }.asStream()) ?: throw DecodeFailException()))
 
 }

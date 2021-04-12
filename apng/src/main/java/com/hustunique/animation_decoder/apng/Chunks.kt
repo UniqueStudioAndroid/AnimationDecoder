@@ -21,8 +21,8 @@ package com.hustunique.animation_decoder.apng
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-import com.hustunique.animation_decoder.core.asReadable
 import com.hustunique.animation_decoder.core.Readable
+import com.hustunique.animation_decoder.core.asReadable
 import java.nio.ByteBuffer
 import java.util.zip.CRC32
 

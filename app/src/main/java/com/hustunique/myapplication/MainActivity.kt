@@ -2,6 +2,8 @@ package com.hustunique.myapplication
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import com.hustunique.animation_decoder.AnimatedImageDrawable
+import com.hustunique.animation_decoder.Obj
 import com.hustunique.myapplication.databinding.ActivityMainBinding
 import java.nio.ByteBuffer
 
@@ -18,15 +20,15 @@ class MainActivity : AppCompatActivity() {
     private fun initView() {
         val buffer = ByteBuffer.wrap(assets.open("elephant.png").readBytes())//.array()
 //        val bm = BitmapFactory.decodeByteArray(buffer, 0, buffer.size)
-//        val frameList = com.hustunique.animation_decoder.AnimationDecoder().decode(buffer)
-//        val d = AnimatedImageDrawable(frameList)
-//        binding.img.setImageDrawable(d)
-//        binding.button.setOnClickListener {
-//            if (d.isRunning) {
-//                d.stop()
-//            } else {
-//                d.start()
-//            }
-//        }
+        val frameList = Obj.decoder.decode(buffer)
+        val d = AnimatedImageDrawable(frameList)
+        binding.img.setImageDrawable(d)
+        binding.button.setOnClickListener {
+            if (d.isRunning) {
+                d.stop()
+            } else {
+                d.start()
+            }
+        }
     }
 }

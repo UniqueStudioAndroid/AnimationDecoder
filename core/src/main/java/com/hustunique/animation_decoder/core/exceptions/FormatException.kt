@@ -1,4 +1,4 @@
-package com.hustunique.animation_decoder
+package com.hustunique.animation_decoder.core.exceptions
 
 /**
  * Copyright (C) 2021 xiaoyuxuan

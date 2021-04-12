@@ -10,6 +10,4 @@ java {
 
 dependencies {
     implementation(kotlin("stdlib", Dep.Kt.KOTLIN_VERSION))
-
-    api(project(":api"))
 }

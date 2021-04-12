@@ -38,8 +38,10 @@ android {
 
 dependencies {
 
+    api(project(":api"))
     implementation(project(":core"))
     implementation(project(":apng"))
+
     implementation(kotlin("stdlib", Dep.Kt.KOTLIN_VERSION))
     testImplementation(Dep.Test.JUNIT)
 

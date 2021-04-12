@@ -21,9 +21,9 @@ import java.nio.ByteBuffer
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-interface Parser {
+interface Parser<DT> {
 
-    fun parse(data: ByteBuffer): Decodable
+    fun parse(data: ByteBuffer): Decodable<DT>
 
     fun handles(data: ByteBuffer): Boolean
 

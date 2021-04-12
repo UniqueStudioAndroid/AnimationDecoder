@@ -1,6 +1,6 @@
-package com.hustunique.animation_decoder.apng
+package com.hustunique.animation_decoder.api
 
-import com.hustunique.animation_decoder.api.Frame
+import java.nio.ByteBuffer
 
 /**
  * Copyright (C) 2021 xiaoyuxuan
@@ -21,36 +21,6 @@ import com.hustunique.animation_decoder.api.Frame
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-/**
- * Represent a frame draw on [Canvas]
- */
-class APngFrame<DT>(
-    image: DT,
-    val options: APngFrameOptions
-) : Frame<DT>(image)
-
-/**
- * Frame rendering options extracts from [FCTLChunk]
- */
-data class APngFrameOptions(
-    val width: Int,
-    val height: Int,
-    val xOffset: Int,
-    val yOffset: Int,
-    val delayInMillis: Long,
-    val disposeOp: Byte,
-    val blendOp: Byte
-) {
-    init {
-        check(disposeOp < 3) {
-            "error png format(disposeOp out of range)"
-        }
-        check(blendOp < 2) {
-            "error png format(blendOp out of range)"
-        }
-    }
-
-    val xOffsetF: Float = xOffset.toFloat()
-
-    val yOffsetF: Float = yOffset.toFloat()
+interface AnimationDecoder<DT> {
+    fun decode(data: ByteBuffer): List<Frame<DT>>
 }

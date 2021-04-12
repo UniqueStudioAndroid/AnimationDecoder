@@ -21,10 +21,10 @@ import java.io.InputStream
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-interface FrameDecoder {
+interface FrameDecoder<DT> {
 
-    fun decode(inStream: InputStream): Drawable
+    fun decode(inStream: InputStream): DT?
 
 }
 
-typealias DecodeAction = (InputStream) -> Drawable
+typealias DecodeAction<DT> = (InputStream) -> DT?

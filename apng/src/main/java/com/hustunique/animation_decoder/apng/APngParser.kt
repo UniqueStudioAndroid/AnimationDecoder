@@ -26,7 +26,7 @@ import java.nio.ByteBuffer
 /**
  * Represent a png file, extract from [data]
  */
-class APngParser() : Parser {
+class APngParser<DT>() : Parser<DT> {
     private var rawFrame: RawFrameData? = null
 
     companion object {
@@ -52,7 +52,7 @@ class APngParser() : Parser {
         return chunk
     }
 
-    private fun process(builder: APngDecodable.Builder, chunk: BaseChunk) {
+    private fun process(builder: APngDecodable.Builder<DT>, chunk: BaseChunk) {
         when (chunk) {
             is IHDRChunk -> {
                 builder.setHeader(chunk)
@@ -77,10 +77,10 @@ class APngParser() : Parser {
         return true
     }
 
-    override fun parse(data: ByteBuffer): Decodable {
+    override fun parse(data: ByteBuffer): Decodable<DT> {
         reset()
         readAndCheckSignature(data)
-        val aPngParsedObjectBuilder = APngDecodable.Builder()
+        val aPngParsedObjectBuilder = APngDecodable.Builder<DT>()
         while (data.remaining() > 0) {
             val chunk = readAndUnBox(data)
             process(aPngParsedObjectBuilder, chunk)

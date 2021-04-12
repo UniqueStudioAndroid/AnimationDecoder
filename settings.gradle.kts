@@ -1,3 +1,4 @@
+include(":api")
 include(":apng")
 include(":core")
 include(":android_platform")

@@ -1,4 +1,9 @@
-package com.hustunique.animation_decoder.core
+package com.hustunique.animation_decoder
+
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import com.hustunique.animation_decoder.core.FrameDecoder
+import java.io.InputStream
 
 /**
  * Copyright (C) 2021 xiaoyuxuan
@@ -19,5 +24,7 @@ package com.hustunique.animation_decoder.core
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-interface Drawable {
+class BitmapFactoryDecoder : FrameDecoder<Bitmap> {
+    override fun decode(inStream: InputStream): Bitmap? =
+        BitmapFactory.decodeStream(inStream)
 }
