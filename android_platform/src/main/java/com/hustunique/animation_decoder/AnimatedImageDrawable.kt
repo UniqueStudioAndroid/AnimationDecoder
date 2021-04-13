@@ -5,8 +5,9 @@ import android.graphics.drawable.Animatable
 import android.graphics.drawable.Drawable
 import android.os.SystemClock
 import android.util.Log
-import com.hustunique.animation_decoder.apng.APngFrame
 import com.hustunique.animation_decoder.api.Frame
+import com.hustunique.animation_decoder.apng.APngFrame
+import com.hustunique.animation_decoder.apng.APngFrameOptions
 
 /**
  * Copyright (C) 2021 xiaoyuxuan
@@ -51,6 +52,16 @@ class AnimatedImageDrawable() : Drawable(), Animatable {
         }
     }
 
+    private var mBitmap: Bitmap = bounds.let {
+        Bitmap.createBitmap(
+            if (it.width() > 0) it.width() else 1,
+            if (it.height() > 0) it.height() else 1,
+            Bitmap.Config.ARGB_8888
+        )
+    }
+
+    private var mCanvas = Canvas(mBitmap)
+
     constructor(aPngFrameList: List<Frame<Bitmap>>) : this() {
         this.mAPngFrameList = aPngFrameList.map { it as APngFrame<Bitmap> }
     }
@@ -60,13 +71,62 @@ class AnimatedImageDrawable() : Drawable(), Animatable {
             mStarting = false
             mRunning = true
         }
-        mAPngFrameList?.let {
-            it[mCurIdx++ % it.size]
-        }?.run {
-            options.run {
-                canvas.drawBitmap(image, xOffsetF, yOffsetF, mPaint)
-                scheduleSelf(mUpdater, nextAnimationTime(delayInMillis))
+        if (bounds.width() != mBitmap.width || bounds.height() != mBitmap.height) {
+            resetBitmap()
+        }
+        if (mCurIdx < mAPngFrameList?.size ?: 0) {
+            mAPngFrameList?.let {
+                it[mCurIdx++ % it.size]
+            }?.run {
+                options.run {
+                    when (options.blendOp) {
+                        APngFrameOptions.APNG_FRAME_BLEND_OP_SOURCE -> {
+                            mPaint.xfermode = PorterDuffXfermode(PorterDuff.Mode.SRC)
+                        }
+                        APngFrameOptions.APNG_FRAME_BLEND_OP_OVER -> {
+                            mPaint.xfermode = PorterDuffXfermode(PorterDuff.Mode.SRC_OVER)
+                        }
+                        else -> throw IllegalStateException()
+                    }
+                    when (options.disposeOp) {
+                        APngFrameOptions.APNG_FRAME_DISPOSE_OP_NONE -> {
+                            mCanvas.drawBitmap(image, xOffsetF, yOffsetF, mPaint)
+                            canvas.drawBitmap(mBitmap, 0f, 0f, null)
+                        }
+                        APngFrameOptions.APNG_FRAME_DISPOSE_OP_BACKGROUND -> {
+                            mCanvas.drawBitmap(image, xOffsetF, yOffsetF, mPaint)
+                            canvas.drawBitmap(mBitmap, 0f, 0f, null)
+                            mCanvas.drawRect(
+                                Rect(
+                                    xOffset,
+                                    yOffset,
+                                    xOffset + width,
+                                    yOffset + height
+                                ), mPaint.apply {
+                                    color = Color.TRANSPARENT
+                                    xfermode = PorterDuffXfermode(PorterDuff.Mode.CLEAR)
+                                })
+                            if (mCurIdx == mAPngFrameList?.size) {
+                                mCanvas.drawBitmap(image, xOffsetF, yOffsetF, null)
+                            }
+                            Log.i(TAG, "draw: dispose background")
+                        }
+                        APngFrameOptions.APNG_FRAME_DISPOSE_OP_PREVIOUS -> {
+                            canvas.drawBitmap(mBitmap, 0f, 0f, null)
+                            canvas.drawBitmap(image, xOffsetF, yOffsetF, mPaint)
+                            if (mCurIdx == mAPngFrameList?.size) {
+                                mCanvas.drawBitmap(image, xOffsetF, yOffsetF, null)
+                            }
+                        }
+                        else -> throw IllegalStateException()
+                    }
+                    scheduleSelf(mUpdater, nextAnimationTime(delayInMillis))
+                    mPaint.xfermode = null
+                }
             }
+        } else {
+            canvas.drawBitmap(mBitmap, 0f, 0f, null)
+            mRunning = false
         }
         Log.i(TAG, "draw: ${System.currentTimeMillis()}")
     }
@@ -82,6 +142,7 @@ class AnimatedImageDrawable() : Drawable(), Animatable {
     override fun getOpacity(): Int = PixelFormat.TRANSLUCENT
 
     override fun start() {
+        mCurIdx = 0
         mStarting = true
         invalidateSelf()
     }
@@ -92,6 +153,22 @@ class AnimatedImageDrawable() : Drawable(), Animatable {
     }
 
     override fun isRunning(): Boolean = mRunning
+
+    private fun resetBitmap(force: Boolean = false) {
+        if (!force) {
+            if (mBitmap.width == bounds.width() || mBitmap.height == bounds.height()) {
+                return
+            }
+        }
+        bounds.let {
+            mBitmap = Bitmap.createBitmap(
+                if (it.width() > 0) it.width() else 1,
+                if (it.height() > 0) it.height() else 1,
+                Bitmap.Config.ARGB_8888
+            )
+        }
+        mCanvas = Canvas(mBitmap)
+    }
 
     private fun nextAnimationTime(delayInMillis: Long = ANIMATION_GAP): Long =
         SystemClock.uptimeMillis() + delayInMillis

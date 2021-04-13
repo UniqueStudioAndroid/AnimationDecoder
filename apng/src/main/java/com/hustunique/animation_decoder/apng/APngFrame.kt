@@ -41,6 +41,15 @@ data class APngFrameOptions(
     val disposeOp: Byte,
     val blendOp: Byte
 ) {
+
+    companion object {
+        const val APNG_FRAME_DISPOSE_OP_NONE = 0.toByte()
+        const val APNG_FRAME_DISPOSE_OP_BACKGROUND = 1.toByte()
+        const val APNG_FRAME_DISPOSE_OP_PREVIOUS = 2.toByte()
+        const val APNG_FRAME_BLEND_OP_SOURCE = 0.toByte()
+        const val APNG_FRAME_BLEND_OP_OVER = 1.toByte()
+    }
+
     init {
         check(disposeOp < 3) {
             "error png format(disposeOp out of range)"
