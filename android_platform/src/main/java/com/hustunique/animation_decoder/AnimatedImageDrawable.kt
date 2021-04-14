@@ -8,6 +8,7 @@ import android.util.Log
 import com.hustunique.animation_decoder.api.Frame
 import com.hustunique.animation_decoder.apng.APngFrame
 import com.hustunique.animation_decoder.apng.APngFrameOptions
+import com.hustunique.animation_decoder.apng.webp.WebPFrame
 
 /**
  * Copyright (C) 2021 xiaoyuxuan
@@ -40,7 +41,7 @@ class AnimatedImageDrawable() : Drawable(), Animatable {
     @Volatile
     private var mRunning = false
 
-    private var mAPngFrameList: List<APngFrame<Bitmap>>? = null
+    private var mAPngFrameList: List<WebPFrame<Bitmap>>? = null
 
     private var mCurIdx = 0
 
@@ -63,7 +64,7 @@ class AnimatedImageDrawable() : Drawable(), Animatable {
     private var mCanvas = Canvas(mBitmap)
 
     constructor(aPngFrameList: List<Frame<Bitmap>>) : this() {
-        this.mAPngFrameList = aPngFrameList.map { it as APngFrame<Bitmap> }
+        this.mAPngFrameList = aPngFrameList.map { it as WebPFrame<Bitmap> }
     }
 
     override fun draw(canvas: Canvas) {
@@ -98,10 +99,10 @@ class AnimatedImageDrawable() : Drawable(), Animatable {
                             canvas.drawBitmap(mBitmap, 0f, 0f, null)
                             mCanvas.drawRect(
                                 Rect(
-                                    xOffset,
-                                    yOffset,
-                                    xOffset + width,
-                                    yOffset + height
+                                    xOffset.toInt(),
+                                    yOffset.toInt(),
+                                    (xOffset + width).toInt(),
+                                    (yOffset + height).toInt()
                                 ), mPaint.apply {
                                     color = Color.TRANSPARENT
                                     xfermode = PorterDuffXfermode(PorterDuff.Mode.CLEAR)
@@ -120,7 +121,7 @@ class AnimatedImageDrawable() : Drawable(), Animatable {
                         }
                         else -> throw IllegalStateException()
                     }
-                    scheduleSelf(mUpdater, nextAnimationTime(delayInMillis))
+                    scheduleSelf(mUpdater, nextAnimationTime(delayInMillis.toLong()))
                     mPaint.xfermode = null
                 }
             }

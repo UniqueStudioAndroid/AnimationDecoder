@@ -36,6 +36,7 @@ class AnimationDecoderImpl<DT>(
     @Throws(IllegalStateException::class, IllegalArgumentException::class)
     override fun decode(data: ByteBuffer): List<Frame<DT>> {
         val parsedObj = parsers.first { it.handles(data) }.parse(data)
+        println(parsedObj)
         return parsedObj.createFrames {
             frameDecoder.decode(it)
         }

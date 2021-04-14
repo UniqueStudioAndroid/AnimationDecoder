@@ -1,12 +1,11 @@
-package com.hustunique.animation_decoder
-
-import android.graphics.Bitmap
-import com.hustunique.animation_decoder.api.AnimationDecoder
-import com.hustunique.animation_decoder.apng.APngParser
 import com.hustunique.animation_decoder.apng.webp.WebPParser
+import org.jetbrains.annotations.TestOnly
+import org.junit.Test
+import java.io.File
+import java.nio.ByteBuffer
 
 /**
- * Copyright (C) 2021 xiaoyuxuan
+ * Copyright (C) 2021 little-csd
  * All rights reserved.
  *
  * This library is free software; you can redistribute it and/or
@@ -24,9 +23,18 @@ import com.hustunique.animation_decoder.apng.webp.WebPParser
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-object Obj {
+class TestWebP {
 
-    val decoder: AnimationDecoder<Bitmap> =
-        AnimationDecoderImpl(listOf(WebPParser(), APngParser()), BitmapFactoryDecoder())
-
+    @Test
+    fun testDecode() {
+        val buffer = ByteBuffer.wrap(File("ani_test.webp").readBytes())
+        val parser = WebPParser<Int>()
+        var count = 0
+        parser.parse(buffer).createFrames {
+            val file = File("ani_test$count.webp")
+            if (!file.exists()) file.createNewFile()
+            file.writeBytes(it.readBytes())
+            count++
+        }
+    }
 }
