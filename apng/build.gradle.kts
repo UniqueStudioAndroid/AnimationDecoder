@@ -12,4 +12,6 @@ dependencies {
     implementation(project(":core"))
 
     implementation(kotlin("stdlib", Dep.Kt.KOTLIN_VERSION))
+
+    testImplementation(Dep.Test.JUNIT)
 }

@@ -1,5 +1,6 @@
 package com.hustunique.myapplication
 
+import android.graphics.ImageDecoder
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.hustunique.animation_decoder.AnimatedImageDrawable
@@ -18,7 +19,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun initView() {
-        val buffer = ByteBuffer.wrap(assets.open("elephant.png").readBytes())//.array()
+        val buffer = ByteBuffer.wrap(assets.open("ani_test.webp").readBytes())//.array()
 //        val bm = BitmapFactory.decodeByteArray(buffer, 0, buffer.size)
         val frameList = Obj.decoder.decode(buffer)
         val d = AnimatedImageDrawable(frameList)

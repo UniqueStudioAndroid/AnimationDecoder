@@ -89,6 +89,16 @@ fun Int.asReadable(isBigEndian: Boolean = false): Readable = object : Readable {
     }
 }
 
+fun Byte.asReadable(): Readable = object : Readable {
+    private var hasRead = false
+
+    override fun read(): Byte {
+        return this@asReadable
+    }
+
+    override fun available() = if (hasRead) 0 else 1
+}
+
 /**
  * Wrap [ByteBuffer] object to a Readable
  * NOTE: Default byte order is BitEndian

@@ -1,12 +1,9 @@
-package com.hustunique.animation_decoder
+package com.hustunique.animation_decoder.apng.webp
 
-import android.graphics.Bitmap
-import com.hustunique.animation_decoder.api.AnimationDecoder
-import com.hustunique.animation_decoder.apng.APngParser
-import com.hustunique.animation_decoder.apng.webp.WebPParser
+import com.hustunique.animation_decoder.api.Frame
 
 /**
- * Copyright (C) 2021 xiaoyuxuan
+ * Copyright (C) 2021 little-csd
  * All rights reserved.
  *
  * This library is free software; you can redistribute it and/or
@@ -24,9 +21,17 @@ import com.hustunique.animation_decoder.apng.webp.WebPParser
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-object Obj {
+class WebPFrame<DT> (
+    image: DT,
+    val options: WebPOptions
+) : Frame<DT>(image)
 
-    val decoder: AnimationDecoder<Bitmap> =
-        AnimationDecoderImpl(listOf(WebPParser(), APngParser()), BitmapFactoryDecoder())
-
-}
+data class WebPOptions(
+    val width: UInt,
+    val height: UInt,
+    val xOffset: UInt,
+    val yOffset: UInt,
+    val delayInMillis: UInt,
+    val disposeOp: Byte,
+    val blendOp: Byte
+)

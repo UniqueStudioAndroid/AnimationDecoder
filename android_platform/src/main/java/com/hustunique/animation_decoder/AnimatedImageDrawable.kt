@@ -7,6 +7,7 @@ import android.os.SystemClock
 import android.util.Log
 import com.hustunique.animation_decoder.apng.APngFrame
 import com.hustunique.animation_decoder.api.Frame
+import com.hustunique.animation_decoder.apng.webp.WebPFrame
 
 /**
  * Copyright (C) 2021 xiaoyuxuan
@@ -39,7 +40,7 @@ class AnimatedImageDrawable() : Drawable(), Animatable {
     @Volatile
     private var mRunning = false
 
-    private var mAPngFrameList: List<APngFrame<Bitmap>>? = null
+    private var mAPngFrameList: List<WebPFrame<Bitmap>>? = null
 
     private var mCurIdx = 0
 
@@ -52,7 +53,7 @@ class AnimatedImageDrawable() : Drawable(), Animatable {
     }
 
     constructor(aPngFrameList: List<Frame<Bitmap>>) : this() {
-        this.mAPngFrameList = aPngFrameList.map { it as APngFrame<Bitmap> }
+        this.mAPngFrameList = aPngFrameList.map { it as WebPFrame<Bitmap> }
     }
 
     override fun draw(canvas: Canvas) {
@@ -64,8 +65,8 @@ class AnimatedImageDrawable() : Drawable(), Animatable {
             it[mCurIdx++ % it.size]
         }?.run {
             options.run {
-                canvas.drawBitmap(image, xOffsetF, yOffsetF, mPaint)
-                scheduleSelf(mUpdater, nextAnimationTime(delayInMillis))
+                canvas.drawBitmap(image, xOffset.toFloat(), yOffset.toFloat(), mPaint)
+                scheduleSelf(mUpdater, nextAnimationTime(delayInMillis.toLong()))
             }
         }
         Log.i(TAG, "draw: ${System.currentTimeMillis()}")
