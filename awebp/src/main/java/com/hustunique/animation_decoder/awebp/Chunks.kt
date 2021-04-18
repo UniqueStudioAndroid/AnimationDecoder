@@ -2,6 +2,8 @@
 
 package com.hustunique.animation_decoder.awebp
 
+import com.hustunique.animation_decoder.api.FrameBlendOptions
+import com.hustunique.animation_decoder.api.FrameDisposeOptions
 import com.hustunique.animation_decoder.api.FrameOptions
 import com.hustunique.animation_decoder.core.Readable
 import java.nio.ByteBuffer
@@ -70,11 +72,12 @@ open class BaseChunk(val buffer: ByteBuffer) {
 }
 
 class ANIMChunk(buffer: ByteBuffer) : BaseChunk(buffer) {
-    val color: UInt
-        get() = readAt(8)
+    val color: Int by lazy {
+        readAt(8).toInt()
+    }
 
-    val loopCount: UInt
-        get() = readAt(12, 2)
+    val loopCount: Int
+        get() = readAt(12, 2).toInt()
 }
 
 class ANMFChunk(buffer: ByteBuffer) : BaseChunk(buffer) {
@@ -88,10 +91,16 @@ class ANMFChunk(buffer: ByteBuffer) : BaseChunk(buffer) {
         get() = readAt(17, 3) + 1U
     val duration: UInt
         get() = readAt(20, 3)
-    val blendOp: Byte
-        get() = ((readAt(23, 1) shr 1) and 0x1U).toByte()
-    val disposeOp: Byte
-        get() = (readAt(23, 1) and 0x1U).toByte()
+    val blendOp: FrameBlendOptions by lazy {
+        val op = (readAt(23, 1) shr 1) and 0x1U
+        if (op == 0U) FrameBlendOptions.BLEND_OP_SRC_OVER
+        else FrameBlendOptions.BLEND_OP_SRC
+    }
+    val disposeOp: FrameDisposeOptions by lazy {
+        val op = readAt(23, 1) and 0x1U
+        if (op == 0U) FrameDisposeOptions.DISPOSE_OP_NONE
+        else FrameDisposeOptions.DISPOSE_OP_BACKGROUND
+    }
 
     val frameData: BaseChunk
         get() = BaseChunk(
@@ -108,8 +117,8 @@ class ANMFChunk(buffer: ByteBuffer) : BaseChunk(buffer) {
         frameX.toInt(),
         frameY.toInt(),
         duration.toLong(),
-        disposeOp.toInt(),
-        blendOp.toInt()
+        disposeOp,
+        blendOp
     )
 }
 

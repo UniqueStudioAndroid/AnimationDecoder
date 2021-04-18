@@ -1,5 +1,6 @@
 package com.hustunique.animation_decoder.awebp
 
+import com.hustunique.animation_decoder.api.AnimatedImage
 import com.hustunique.animation_decoder.api.Frame
 import com.hustunique.animation_decoder.core.*
 import com.hustunique.animation_decoder.core.exceptions.DecodeFailException
@@ -27,19 +28,23 @@ class WebPDecodable<DT> constructor(
     val animChunk: ANIMChunk,
     val anmfChunks: List<ANMFChunk>,
 ) : Decodable<DT> {
-    override fun createFrames(decodeAction: DecodeAction<DT>): List<Frame<DT>> = anmfChunks.map {
-        Frame(
-            decodeAction(
-                readable {
-                    add(WebPChunkType.TYPE_RIFF.asReadable())
-                    add((it.size.toInt() - 12).asReadable(true))
-                    add(WebPChunkType.TYPE_WEBP.asReadable())
-                    add(it.frameData.asReadable())
-                }.asStream()
-            ) ?: throw DecodeFailException(),
-            it.toFrameOptions()
-        )
-    }
+    override fun createAnimatedImage(decodeAction: DecodeAction<DT>): AnimatedImage<DT> = AnimatedImage(
+        anmfChunks.map {
+            Frame(
+                decodeAction(
+                    readable {
+                        add(WebPChunkType.TYPE_RIFF.asReadable())
+                        add((it.size.toInt() - 12).asReadable(true))
+                        add(WebPChunkType.TYPE_WEBP.asReadable())
+                        add(it.frameData.asReadable())
+                    }.asStream()
+                ) ?: throw DecodeFailException(),
+                it.toFrameOptions()
+            )
+        },
+        loop = animChunk.loopCount,
+        backgroundColor = animChunk.color
+    )
 
     class Builder<DT> {
         private var animChunk: ANIMChunk? = null

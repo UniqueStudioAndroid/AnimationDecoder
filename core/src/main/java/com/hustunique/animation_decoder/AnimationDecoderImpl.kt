@@ -21,7 +21,6 @@ package com.hustunique.animation_decoder
 
 import com.hustunique.animation_decoder.api.AnimatedImage
 import com.hustunique.animation_decoder.api.AnimationDecoder
-import com.hustunique.animation_decoder.api.Frame
 import com.hustunique.animation_decoder.core.FrameDecoder
 import com.hustunique.animation_decoder.core.Parser
 import java.io.File
@@ -38,7 +37,7 @@ class AnimationDecoderImpl<DT>(
     override fun decode(data: ByteBuffer): AnimatedImage<DT> {
         val parsedObj = parsers.first { it.handles(data) }.parse(data)
         println(parsedObj)
-        return parsedObj.createFrames {
+        return parsedObj.createAnimatedImage {
             frameDecoder.decode(it)
         }
     }

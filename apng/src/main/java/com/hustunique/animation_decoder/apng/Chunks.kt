@@ -21,10 +21,14 @@ package com.hustunique.animation_decoder.apng
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
+import com.hustunique.animation_decoder.api.FrameBlendOptions
+import com.hustunique.animation_decoder.api.FrameDisposeOptions
 import com.hustunique.animation_decoder.api.FrameOptions
 import com.hustunique.animation_decoder.core.Readable
 import com.hustunique.animation_decoder.core.asReadable
+import com.hustunique.animation_decoder.core.exceptions.FormatException
 import java.nio.ByteBuffer
+import java.text.Format
 import java.util.zip.CRC32
 
 /**
@@ -106,7 +110,11 @@ class IHDRChunk(buffer: ByteBuffer) : BaseChunk(buffer)
 
 class IDATChunk(buffer: ByteBuffer) : BaseChunk(buffer)
 
-class ACTLChunk(buffer: ByteBuffer) : BaseChunk(buffer)
+class ACTLChunk(buffer: ByteBuffer) : BaseChunk(buffer) {
+    val loop: Int by lazy {
+        readAt(4)
+    }
+}
 
 class FDATChunk(buffer: ByteBuffer) : BaseChunk(buffer) {
 
@@ -160,7 +168,7 @@ class FCTLChunk(buffer: ByteBuffer) : BaseChunk(buffer) {
     val height = readAt(16)
     val xOffset = readAt(20)
     val yOffset = readAt(24)
-    val delayed = let {
+    val delayed : Long by lazy {
         val num = readAt(28, 2)
         val denum = readAt(30, 2)
         when {
@@ -169,8 +177,21 @@ class FCTLChunk(buffer: ByteBuffer) : BaseChunk(buffer) {
             else -> 1000L * num / denum
         }
     }
-    val disposeOp = readAt(32, 1)
-    val blendOp = readAt(33, 1)
+    val disposeOp : FrameDisposeOptions by lazy {
+        when (val op = readAt(32, 1)) {
+            0 -> FrameDisposeOptions.DISPOSE_OP_NONE
+            1 -> FrameDisposeOptions.DISPOSE_OP_BACKGROUND
+            2 -> FrameDisposeOptions.DISPOSE_OP_PREVIOUS
+            else -> throw FormatException("DisposeOp $op not valid!")
+        }
+    }
+    val blendOp : FrameBlendOptions by lazy {
+        when (val op = readAt(33, 1)) {
+            0 -> FrameBlendOptions.BLEND_OP_SRC
+            1 -> FrameBlendOptions.BLEND_OP_SRC_OVER
+            else -> throw FormatException("BlendOp $op not valid!")
+        }
+    }
 
     fun toFrameOptions(): FrameOptions =
         FrameOptions(width, height, xOffset, yOffset, delayed, disposeOp, blendOp)

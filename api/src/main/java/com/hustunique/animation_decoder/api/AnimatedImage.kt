@@ -21,6 +21,6 @@ package com.hustunique.animation_decoder.api
 
 data class AnimatedImage<DT>(
     val frames: List<Frame<DT>>,
-    val loop: Int,
+    val loop: Int = 0,
     val backgroundColor: Int = 0x00000000
 )

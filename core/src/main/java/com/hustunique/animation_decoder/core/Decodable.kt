@@ -1,5 +1,6 @@
 package com.hustunique.animation_decoder.core
 
+import com.hustunique.animation_decoder.api.AnimatedImage
 import com.hustunique.animation_decoder.api.Frame
 
 /**
@@ -23,6 +24,6 @@ import com.hustunique.animation_decoder.api.Frame
 
 interface Decodable<DT> {
 
-    fun createFrames(decodeAction: DecodeAction<DT>): List<Frame<DT>>
+    fun createAnimatedImage(decodeAction: DecodeAction<DT>): AnimatedImage<DT>
 
 }
