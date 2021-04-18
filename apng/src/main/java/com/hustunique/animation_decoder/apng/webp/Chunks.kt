@@ -40,7 +40,7 @@ open class BaseChunk(val buffer: ByteBuffer) {
         buffer.position(index)
         val value = when (len) {
             4 -> buffer.int.toUInt()
-            3 -> (buffer.short.toUInt() shl 8) + buffer.get().toUInt()
+            3 -> buffer.short.toUInt() + (buffer.get().toUInt() shl 16)
             2 -> buffer.short.toUInt()
             else -> buffer.get().toUInt()
         }
