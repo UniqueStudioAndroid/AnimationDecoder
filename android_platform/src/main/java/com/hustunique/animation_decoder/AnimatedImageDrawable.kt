@@ -5,7 +5,9 @@ import android.graphics.drawable.Animatable
 import android.graphics.drawable.Drawable
 import android.os.SystemClock
 import android.util.Log
-import com.hustunique.animation_decoder.api.Frame
+import com.hustunique.animation_decoder.api.AnimatedImage
+import com.hustunique.animation_decoder.api.FrameBlendOptions
+import com.hustunique.animation_decoder.api.FrameDisposeOptions
 
 /**
  * Copyright (C) 2021 xiaoyuxuan
@@ -38,7 +40,7 @@ class AnimatedImageDrawable() : Drawable(), Animatable {
     @Volatile
     private var mRunning = false
 
-    private var mAPngFrameList: List<Frame<Bitmap>>? = null
+    private var mAnimatedImage: AnimatedImage<Bitmap>? = null
 
     private var mCurIdx = 0
 
@@ -60,8 +62,8 @@ class AnimatedImageDrawable() : Drawable(), Animatable {
 
     private var mCanvas = Canvas(mBitmap)
 
-    constructor(aPngFrameList: List<Frame<Bitmap>>) : this() {
-        this.mAPngFrameList = aPngFrameList
+    constructor(animatedImage: AnimatedImage<Bitmap>) : this() {
+        this.mAnimatedImage = animatedImage
     }
 
     override fun draw(canvas: Canvas) {
@@ -72,26 +74,30 @@ class AnimatedImageDrawable() : Drawable(), Animatable {
         if (bounds.width() != mBitmap.width || bounds.height() != mBitmap.height) {
             resetBitmap()
         }
-//        if (mCurIdx < mAPngFrameList?.size ?: 0) {
-            mAPngFrameList?.let {
+        if (mAnimatedImage == null) {
+            return
+        }
+        if (mAnimatedImage?.loop ?: 0 < 0
+            || (mCurIdx / (mAnimatedImage?.frames?.size ?: 1)) < mAnimatedImage?.loop ?: 0
+        ) {
+            mAnimatedImage?.frames?.let {
                 it[mCurIdx++ % it.size]
             }?.run {
                 options?.run {
-//                    when (options.blendOp) {
-//                        APngFrameOptions.APNG_FRAME_BLEND_OP_SOURCE -> {
-//                            mPaint.xfermode = PorterDuffXfermode(PorterDuff.Mode.SRC)
-//                        }
-//                        APngFrameOptions.APNG_FRAME_BLEND_OP_OVER -> {
+                    when (blendOp) {
+                        FrameBlendOptions.BLEND_OP_SRC -> {
+                            mPaint.xfermode = PorterDuffXfermode(PorterDuff.Mode.SRC)
+                        }
+                        FrameBlendOptions.BLEND_OP_SRC_OVER -> {
                             mPaint.xfermode = PorterDuffXfermode(PorterDuff.Mode.SRC_OVER)
-//                        }
-//                        else -> throw IllegalStateException()
-//                    }
+                        }
+                    }
                     when (disposeOp) {
-                        0 -> {
+                        FrameDisposeOptions.DISPOSE_OP_NONE -> {
                             mCanvas.drawBitmap(image, xOffsetF, yOffsetF, mPaint)
                             canvas.drawBitmap(mBitmap, 0f, 0f, null)
                         }
-                        1 -> {
+                        FrameDisposeOptions.DISPOSE_OP_BACKGROUND -> {
                             mCanvas.drawBitmap(image, xOffsetF, yOffsetF, mPaint)
                             canvas.drawBitmap(mBitmap, 0f, 0f, null)
                             mCanvas.drawRect(
@@ -101,31 +107,30 @@ class AnimatedImageDrawable() : Drawable(), Animatable {
                                     xOffset + width,
                                     yOffset + height,
                                 ), mPaint.apply {
-                                    color = Color.TRANSPARENT
+                                    color = mAnimatedImage?.backgroundColor ?: Color.TRANSPARENT
                                     xfermode = PorterDuffXfermode(PorterDuff.Mode.CLEAR)
                                 })
-                            if (mCurIdx == mAPngFrameList?.size) {
+                            if (mCurIdx == mAnimatedImage?.frames?.size) {
                                 mCanvas.drawBitmap(image, xOffsetF, yOffsetF, null)
                             }
                             Log.i(TAG, "draw: dispose background")
                         }
-                        2 -> {
+                        FrameDisposeOptions.DISPOSE_OP_PREVIOUS -> {
                             canvas.drawBitmap(mBitmap, 0f, 0f, null)
                             canvas.drawBitmap(image, xOffsetF, yOffsetF, mPaint)
-                            if (mCurIdx == mAPngFrameList?.size) {
+                            if (mCurIdx == mAnimatedImage?.frames?.size) {
                                 mCanvas.drawBitmap(image, xOffsetF, yOffsetF, null)
                             }
                         }
-                        else -> throw IllegalStateException()
                     }
                     scheduleSelf(mUpdater, nextAnimationTime(delayInMillis))
                     mPaint.xfermode = null
                 }
             }
-//        } else {
-//            canvas.drawBitmap(mBitmap, 0f, 0f, null)
-//            mRunning = false
-//        }
+        } else {
+            canvas.drawBitmap(mBitmap, 0f, 0f, null)
+            mRunning = false
+        }
         Log.i(TAG, "draw: ${System.currentTimeMillis()}")
     }
 
