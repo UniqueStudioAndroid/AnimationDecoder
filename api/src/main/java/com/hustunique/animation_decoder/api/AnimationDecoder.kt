@@ -22,5 +22,5 @@ import java.nio.ByteBuffer
  */
 
 interface AnimationDecoder<DT> {
-    fun decode(data: ByteBuffer): List<Frame<DT>>
+    fun decode(data: ByteBuffer): AnimatedImage<DT>
 }

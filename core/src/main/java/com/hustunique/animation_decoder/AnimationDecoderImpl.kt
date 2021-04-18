@@ -19,6 +19,7 @@ package com.hustunique.animation_decoder
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
+import com.hustunique.animation_decoder.api.AnimatedImage
 import com.hustunique.animation_decoder.api.AnimationDecoder
 import com.hustunique.animation_decoder.api.Frame
 import com.hustunique.animation_decoder.core.FrameDecoder
@@ -31,10 +32,10 @@ class AnimationDecoderImpl<DT>(
     private val frameDecoder: FrameDecoder<DT>
 ) : AnimationDecoder<DT> {
 
-    fun decode(path: String): List<Frame<DT>> = decode(ByteBuffer.wrap(File(path).readBytes()))
+    fun decode(path: String): AnimatedImage<DT> = decode(ByteBuffer.wrap(File(path).readBytes()))
 
     @Throws(IllegalStateException::class, IllegalArgumentException::class)
-    override fun decode(data: ByteBuffer): List<Frame<DT>> {
+    override fun decode(data: ByteBuffer): AnimatedImage<DT> {
         val parsedObj = parsers.first { it.handles(data) }.parse(data)
         println(parsedObj)
         return parsedObj.createFrames {

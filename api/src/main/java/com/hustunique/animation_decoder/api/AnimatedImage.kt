@@ -1,6 +1,5 @@
 package com.hustunique.animation_decoder.api
 
-
 /**
  * Copyright (C) 2021 xiaoyuxuan
  * All rights reserved.
@@ -20,32 +19,8 @@ package com.hustunique.animation_decoder.api
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-class Frame<DT>(
-    val image: DT,
-    val options: FrameOptions?,
+data class AnimatedImage<DT>(
+    val frames: List<Frame<DT>>,
+    val loop: Int,
+    val backgroundColor: Int = 0x00000000
 )
-
-data class FrameOptions(
-    val width: Int,
-    val height: Int,
-    val xOffset: Int,
-    val yOffset: Int,
-    val delayInMillis: Long,
-    val disposeOp: FrameDisposeOptions,
-    val blendOp: FrameBlendOptions,
-) {
-    val xOffsetF by lazy { xOffset.toFloat() }
-    val yOffsetF by lazy { yOffset.toFloat() }
-}
-
-enum class FrameBlendOptions {
-
-    BLEND_OP_SRC, BLEND_OP_SRC_OVER
-
-}
-
-enum class FrameDisposeOptions {
-
-    DISPOSE_OP_NONE, DISPOSE_OP_BACKGROUND, DISPOSE_OP_PREVIOUS
-
-}
