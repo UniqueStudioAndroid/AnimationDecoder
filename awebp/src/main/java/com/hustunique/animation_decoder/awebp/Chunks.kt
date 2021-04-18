@@ -2,6 +2,7 @@
 
 package com.hustunique.animation_decoder.awebp
 
+import com.hustunique.animation_decoder.api.FrameOptions
 import com.hustunique.animation_decoder.core.Readable
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
@@ -101,14 +102,14 @@ class ANMFChunk(buffer: ByteBuffer) : BaseChunk(buffer) {
             ).slice().order(ByteOrder.LITTLE_ENDIAN)
         )
 
-    fun toFrameOptions() = WebPOptions(
-        width,
-        height,
-        frameX,
-        frameY,
-        duration,
-        disposeOp,
-        blendOp
+    fun toFrameOptions() = FrameOptions(
+        width.toInt(),
+        height.toInt(),
+        frameX.toInt(),
+        frameY.toInt(),
+        duration.toLong(),
+        disposeOp.toInt(),
+        blendOp.toInt()
     )
 }
 

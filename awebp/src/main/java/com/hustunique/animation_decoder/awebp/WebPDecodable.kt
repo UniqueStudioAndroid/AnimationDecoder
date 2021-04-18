@@ -28,13 +28,7 @@ class WebPDecodable<DT> constructor(
     val anmfChunks: List<ANMFChunk>,
 ) : Decodable<DT> {
     override fun createFrames(decodeAction: DecodeAction<DT>): List<Frame<DT>> = anmfChunks.map {
-//        val data = readable {
-//            add(WebPChunkType.TYPE_RIFF.asReadable())
-//            add((it.size.toInt() - 4).asReadable())
-//            add(WebPChunkType.TYPE_WEBP.asReadable())
-//            add(it.frameData.asReadable())
-//        }.asStream()
-        WebPFrame(
+        Frame(
             decodeAction(
                 readable {
                     add(WebPChunkType.TYPE_RIFF.asReadable())

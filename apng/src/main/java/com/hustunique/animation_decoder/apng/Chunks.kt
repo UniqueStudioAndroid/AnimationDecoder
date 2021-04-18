@@ -21,6 +21,7 @@ package com.hustunique.animation_decoder.apng
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
+import com.hustunique.animation_decoder.api.FrameOptions
 import com.hustunique.animation_decoder.core.Readable
 import com.hustunique.animation_decoder.core.asReadable
 import java.nio.ByteBuffer
@@ -168,11 +169,11 @@ class FCTLChunk(buffer: ByteBuffer) : BaseChunk(buffer) {
             else -> 1000L * num / denum
         }
     }
-    val disposeOp = readAt(32, 1).toByte()
-    val blendOp = readAt(33, 1).toByte()
+    val disposeOp = readAt(32, 1)
+    val blendOp = readAt(33, 1)
 
-    fun toFrameOptions(): APngFrameOptions =
-        APngFrameOptions(width, height, xOffset, yOffset, delayed, disposeOp, blendOp = blendOp)
+    fun toFrameOptions(): FrameOptions =
+        FrameOptions(width, height, xOffset, yOffset, delayed, disposeOp, blendOp)
 
     override fun toString(): String {
         return super.toString() + " size = ($width, $height), offset = ($xOffset, $yOffset)"

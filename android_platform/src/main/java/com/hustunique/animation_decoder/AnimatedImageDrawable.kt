@@ -6,9 +6,6 @@ import android.graphics.drawable.Drawable
 import android.os.SystemClock
 import android.util.Log
 import com.hustunique.animation_decoder.api.Frame
-import com.hustunique.animation_decoder.apng.APngFrame
-import com.hustunique.animation_decoder.apng.APngFrameOptions
-import com.hustunique.animation_decoder.awebp.WebPFrame
 
 /**
  * Copyright (C) 2021 xiaoyuxuan
@@ -41,7 +38,7 @@ class AnimatedImageDrawable() : Drawable(), Animatable {
     @Volatile
     private var mRunning = false
 
-    private var mAPngFrameList: List<WebPFrame<Bitmap>>? = null
+    private var mAPngFrameList: List<Frame<Bitmap>>? = null
 
     private var mCurIdx = 0
 
@@ -64,7 +61,7 @@ class AnimatedImageDrawable() : Drawable(), Animatable {
     private var mCanvas = Canvas(mBitmap)
 
     constructor(aPngFrameList: List<Frame<Bitmap>>) : this() {
-        this.mAPngFrameList = aPngFrameList.map { it as WebPFrame<Bitmap> }
+        this.mAPngFrameList = aPngFrameList
     }
 
     override fun draw(canvas: Canvas) {
@@ -79,7 +76,7 @@ class AnimatedImageDrawable() : Drawable(), Animatable {
             mAPngFrameList?.let {
                 it[mCurIdx++ % it.size]
             }?.run {
-                options.run {
+                options?.run {
 //                    when (options.blendOp) {
 //                        APngFrameOptions.APNG_FRAME_BLEND_OP_SOURCE -> {
 //                            mPaint.xfermode = PorterDuffXfermode(PorterDuff.Mode.SRC)
@@ -89,20 +86,20 @@ class AnimatedImageDrawable() : Drawable(), Animatable {
 //                        }
 //                        else -> throw IllegalStateException()
 //                    }
-                    when (options.disposeOp) {
-                        APngFrameOptions.APNG_FRAME_DISPOSE_OP_NONE -> {
+                    when (disposeOp) {
+                        0 -> {
                             mCanvas.drawBitmap(image, xOffsetF, yOffsetF, mPaint)
                             canvas.drawBitmap(mBitmap, 0f, 0f, null)
                         }
-                        APngFrameOptions.APNG_FRAME_DISPOSE_OP_BACKGROUND -> {
+                        1 -> {
                             mCanvas.drawBitmap(image, xOffsetF, yOffsetF, mPaint)
                             canvas.drawBitmap(mBitmap, 0f, 0f, null)
                             mCanvas.drawRect(
                                 Rect(
-                                    xOffset.toInt(),
-                                    yOffset.toInt(),
-                                    (xOffset + width).toInt(),
-                                    (yOffset + height).toInt()
+                                    xOffset,
+                                    yOffset,
+                                    xOffset + width,
+                                    yOffset + height,
                                 ), mPaint.apply {
                                     color = Color.TRANSPARENT
                                     xfermode = PorterDuffXfermode(PorterDuff.Mode.CLEAR)
@@ -112,7 +109,7 @@ class AnimatedImageDrawable() : Drawable(), Animatable {
                             }
                             Log.i(TAG, "draw: dispose background")
                         }
-                        APngFrameOptions.APNG_FRAME_DISPOSE_OP_PREVIOUS -> {
+                        2 -> {
                             canvas.drawBitmap(mBitmap, 0f, 0f, null)
                             canvas.drawBitmap(image, xOffsetF, yOffsetF, mPaint)
                             if (mCurIdx == mAPngFrameList?.size) {
@@ -121,7 +118,7 @@ class AnimatedImageDrawable() : Drawable(), Animatable {
                         }
                         else -> throw IllegalStateException()
                     }
-                    scheduleSelf(mUpdater, nextAnimationTime(delayInMillis.toLong()))
+                    scheduleSelf(mUpdater, nextAnimationTime(delayInMillis))
                     mPaint.xfermode = null
                 }
             }

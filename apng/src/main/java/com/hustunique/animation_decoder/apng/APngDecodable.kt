@@ -34,7 +34,7 @@ class APngDecodable<DT> constructor(
 
 
     override fun createFrames(decodeAction: DecodeAction<DT>) = frames.map { frameData ->
-        APngFrame<DT>(
+        Frame<DT>(
             decodeAction(
                 readable {
                     add(SIGNATURE.asReadable())
@@ -100,6 +100,6 @@ open class PngDecodable<DT> constructor(
             add(header.asReadable())
             addAll(defaultFrame.map { it.asReadable() })
             addAll(others.map { it.asReadable() })
-        }.asStream()) ?: throw DecodeFailException()))
+        }.asStream()) ?: throw DecodeFailException(), null))
 
 }

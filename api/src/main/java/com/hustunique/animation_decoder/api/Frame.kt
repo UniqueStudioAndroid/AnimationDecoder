@@ -20,4 +20,20 @@ package com.hustunique.animation_decoder.api
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-open class Frame<DT>(val image: DT)
+class Frame<DT>(
+    val image: DT,
+    val options: FrameOptions?,
+)
+
+data class FrameOptions(
+    val width: Int,
+    val height: Int,
+    val xOffset: Int,
+    val yOffset: Int,
+    val delayInMillis: Long,
+    val disposeOp: Int,
+    val blendOp: Int,
+) {
+    val xOffsetF = xOffset.toFloat()
+    val yOffsetF = yOffset.toFloat()
+}
