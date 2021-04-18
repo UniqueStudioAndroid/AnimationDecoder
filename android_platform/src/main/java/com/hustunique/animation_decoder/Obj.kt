@@ -3,7 +3,7 @@ package com.hustunique.animation_decoder
 import android.graphics.Bitmap
 import com.hustunique.animation_decoder.api.AnimationDecoder
 import com.hustunique.animation_decoder.apng.APngParser
-import com.hustunique.animation_decoder.apng.webp.WebPParser
+import com.hustunique.animation_decoder.awebp.WebPParser
 
 /**
  * Copyright (C) 2021 xiaoyuxuan

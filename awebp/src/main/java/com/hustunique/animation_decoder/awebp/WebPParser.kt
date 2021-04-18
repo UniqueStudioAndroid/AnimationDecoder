@@ -1,4 +1,4 @@
-package com.hustunique.animation_decoder.apng.webp
+package com.hustunique.animation_decoder.awebp
 
 import com.hustunique.animation_decoder.core.Decodable
 import com.hustunique.animation_decoder.core.Parser

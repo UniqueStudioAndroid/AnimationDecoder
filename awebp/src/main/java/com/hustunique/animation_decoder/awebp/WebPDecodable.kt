@@ -1,12 +1,8 @@
-package com.hustunique.animation_decoder.apng.webp
+package com.hustunique.animation_decoder.awebp
 
 import com.hustunique.animation_decoder.api.Frame
-import com.hustunique.animation_decoder.apng.PngDecodable
-import com.hustunique.animation_decoder.apng.makeFakeIHDRReadable
-import com.hustunique.animation_decoder.apng.webp.WebPChunkType
 import com.hustunique.animation_decoder.core.*
 import com.hustunique.animation_decoder.core.exceptions.DecodeFailException
-import java.io.File
 
 /**
  * Copyright (C) 2021 little-csd

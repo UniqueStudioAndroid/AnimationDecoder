@@ -41,6 +41,7 @@ dependencies {
     api(project(":api"))
     implementation(project(":core"))
     implementation(project(":apng"))
+    implementation(project(":awebp"))
 
     implementation(kotlin("stdlib", Dep.Kt.KOTLIN_VERSION))
     testImplementation(Dep.Test.JUNIT)

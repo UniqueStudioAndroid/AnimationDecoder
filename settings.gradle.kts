@@ -1,3 +1,4 @@
+include(":awebp")
 include(":api")
 include(":apng")
 include(":core")

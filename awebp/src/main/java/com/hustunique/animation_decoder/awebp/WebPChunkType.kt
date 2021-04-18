@@ -1,4 +1,4 @@
-package com.hustunique.animation_decoder.apng.webp
+package com.hustunique.animation_decoder.awebp
 
 /**
  * Copyright (C) 2021 little-csd

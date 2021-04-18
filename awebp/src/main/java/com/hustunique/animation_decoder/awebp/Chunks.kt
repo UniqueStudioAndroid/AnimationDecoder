@@ -1,9 +1,8 @@
 @file:Suppress("EXPERIMENTAL_API_USAGE", "EXPERIMENTAL_UNSIGNED_LITERALS")
 
-package com.hustunique.animation_decoder.apng.webp
+package com.hustunique.animation_decoder.awebp
 
 import com.hustunique.animation_decoder.core.Readable
-import com.hustunique.animation_decoder.core.asReadable
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 

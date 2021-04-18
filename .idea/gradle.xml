@@ -15,6 +15,7 @@
             <option value="$PROJECT_DIR$/api" />
             <option value="$PROJECT_DIR$/apng" />
             <option value="$PROJECT_DIR$/app" />
+            <option value="$PROJECT_DIR$/awebp" />
             <option value="$PROJECT_DIR$/buildSrc" />
             <option value="$PROJECT_DIR$/core" />
           </set>

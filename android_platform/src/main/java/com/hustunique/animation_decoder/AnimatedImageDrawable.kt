@@ -8,7 +8,7 @@ import android.util.Log
 import com.hustunique.animation_decoder.api.Frame
 import com.hustunique.animation_decoder.apng.APngFrame
 import com.hustunique.animation_decoder.apng.APngFrameOptions
-import com.hustunique.animation_decoder.apng.webp.WebPFrame
+import com.hustunique.animation_decoder.awebp.WebPFrame
 
 /**
  * Copyright (C) 2021 xiaoyuxuan
@@ -75,20 +75,20 @@ class AnimatedImageDrawable() : Drawable(), Animatable {
         if (bounds.width() != mBitmap.width || bounds.height() != mBitmap.height) {
             resetBitmap()
         }
-        if (mCurIdx < mAPngFrameList?.size ?: 0) {
+//        if (mCurIdx < mAPngFrameList?.size ?: 0) {
             mAPngFrameList?.let {
                 it[mCurIdx++ % it.size]
             }?.run {
                 options.run {
-                    when (options.blendOp) {
-                        APngFrameOptions.APNG_FRAME_BLEND_OP_SOURCE -> {
-                            mPaint.xfermode = PorterDuffXfermode(PorterDuff.Mode.SRC)
-                        }
-                        APngFrameOptions.APNG_FRAME_BLEND_OP_OVER -> {
+//                    when (options.blendOp) {
+//                        APngFrameOptions.APNG_FRAME_BLEND_OP_SOURCE -> {
+//                            mPaint.xfermode = PorterDuffXfermode(PorterDuff.Mode.SRC)
+//                        }
+//                        APngFrameOptions.APNG_FRAME_BLEND_OP_OVER -> {
                             mPaint.xfermode = PorterDuffXfermode(PorterDuff.Mode.SRC_OVER)
-                        }
-                        else -> throw IllegalStateException()
-                    }
+//                        }
+//                        else -> throw IllegalStateException()
+//                    }
                     when (options.disposeOp) {
                         APngFrameOptions.APNG_FRAME_DISPOSE_OP_NONE -> {
                             mCanvas.drawBitmap(image, xOffsetF, yOffsetF, mPaint)
@@ -125,10 +125,10 @@ class AnimatedImageDrawable() : Drawable(), Animatable {
                     mPaint.xfermode = null
                 }
             }
-        } else {
-            canvas.drawBitmap(mBitmap, 0f, 0f, null)
-            mRunning = false
-        }
+//        } else {
+//            canvas.drawBitmap(mBitmap, 0f, 0f, null)
+//            mRunning = false
+//        }
         Log.i(TAG, "draw: ${System.currentTimeMillis()}")
     }
 
