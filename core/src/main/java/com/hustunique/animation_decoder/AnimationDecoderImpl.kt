@@ -36,7 +36,6 @@ class AnimationDecoderImpl<DT>(
     @Throws(IllegalStateException::class, IllegalArgumentException::class)
     override fun decode(data: ByteBuffer): AnimatedImage<DT> {
         val parsedObj = parsers.first { it.handles(data) }.parse(data)
-        println(parsedObj)
         return parsedObj.createAnimatedImage {
             frameDecoder.decode(it)
         }

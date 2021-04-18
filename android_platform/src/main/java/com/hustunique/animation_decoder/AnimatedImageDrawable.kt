@@ -77,7 +77,7 @@ class AnimatedImageDrawable() : Drawable(), Animatable {
         if (mAnimatedImage == null) {
             return
         }
-        if (mAnimatedImage?.loop ?: 0 < 0
+        if (mAnimatedImage?.loop ?: 0 == 0
             || (mCurIdx / (mAnimatedImage?.frames?.size ?: 1)) < mAnimatedImage?.loop ?: 0
         ) {
             mAnimatedImage?.frames?.let {

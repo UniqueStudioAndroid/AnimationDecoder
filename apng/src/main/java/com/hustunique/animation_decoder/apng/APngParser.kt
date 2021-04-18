@@ -74,7 +74,9 @@ class APngParser<DT>() : Parser<DT> {
     }
 
     override fun handles(data: ByteBuffer): Boolean {
-        return true
+        val signature = data.long
+        data.position(0)
+        return signature == PNG_SIGNATURE
     }
 
     override fun parse(data: ByteBuffer): Decodable<DT> {
