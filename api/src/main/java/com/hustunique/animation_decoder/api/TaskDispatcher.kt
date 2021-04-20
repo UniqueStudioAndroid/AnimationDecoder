@@ -1,7 +1,4 @@
-package com.hustunique.animation_decoder.core
-
-import com.hustunique.animation_decoder.api.AnimatedImage
-import com.hustunique.animation_decoder.api.TaskDispatcher
+package com.hustunique.animation_decoder.api
 
 /**
  * Copyright (C) 2021 xiaoyuxuan
@@ -22,8 +19,12 @@ import com.hustunique.animation_decoder.api.TaskDispatcher
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-interface Decodable<DT> {
+interface TaskDispatcher {
 
-    fun createAnimatedImage(taskDispatcher: TaskDispatcher, decodeAction: DecodeAction<DT>): AnimatedImage<DT>
+    fun dispatch(t: Task)
 
+}
+
+fun interface Task {
+    fun run()
 }

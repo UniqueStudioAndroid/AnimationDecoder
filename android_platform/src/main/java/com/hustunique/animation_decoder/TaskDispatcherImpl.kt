@@ -1,7 +1,9 @@
-package com.hustunique.animation_decoder.core
+package com.hustunique.animation_decoder
 
-import com.hustunique.animation_decoder.api.AnimatedImage
+import android.util.Log
+import com.hustunique.animation_decoder.api.Task
 import com.hustunique.animation_decoder.api.TaskDispatcher
+import java.util.concurrent.Executors
 
 /**
  * Copyright (C) 2021 xiaoyuxuan
@@ -22,8 +24,25 @@ import com.hustunique.animation_decoder.api.TaskDispatcher
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-interface Decodable<DT> {
+class TaskDispatcherImpl : TaskDispatcher {
 
-    fun createAnimatedImage(taskDispatcher: TaskDispatcher, decodeAction: DecodeAction<DT>): AnimatedImage<DT>
+    companion object {
+        private const val TAG = "TaskDispatcherImpl"
+    }
+
+    val executor = Executors.newFixedThreadPool(5)
+
+
+    override fun dispatch(t: Task) {
+        executor.execute {
+            Log.i(TAG, "dispatch: start at ${Thread.currentThread()}")
+            val s = System.currentTimeMillis()
+            t.run()
+            Log.i(
+                TAG,
+                "dispatch: end cost ${System.currentTimeMillis() - s} ${Thread.currentThread()}"
+            )
+        }
+    }
 
 }

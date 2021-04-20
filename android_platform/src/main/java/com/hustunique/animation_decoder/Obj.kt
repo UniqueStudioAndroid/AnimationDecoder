@@ -27,6 +27,10 @@ import com.hustunique.animation_decoder.awebp.WebPParser
 object Obj {
 
     val decoder: AnimationDecoder<Bitmap> =
-        AnimationDecoderImpl(listOf(WebPParser(), APngParser()), BitmapFactoryDecoder())
+        AnimationDecoderImpl(
+            listOf(WebPParser(), APngParser()),
+            BitmapFactoryDecoder(),
+            TaskDispatcherImpl()
+        )
 
 }

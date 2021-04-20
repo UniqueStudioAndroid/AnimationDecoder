@@ -21,9 +21,30 @@ package com.hustunique.animation_decoder.api
  */
 
 class Frame<DT>(
-    val image: DT,
+//    val image: DT,
     val options: FrameOptions?,
-)
+) {
+
+    val completed: Boolean
+        get() = imgWrapper != null
+
+
+    val image: DT
+        get() = imgWrapper!!
+
+    val onCompletedActions: MutableList<(Frame<DT>) -> Unit> = mutableListOf()
+
+    var imgWrapper: DT? = null
+        set(value) {
+            field = value
+            if (value != null) {
+                onCompletedActions.forEach {
+                    it(this)
+                }
+                onCompletedActions.clear()
+            }
+        }
+}
 
 data class FrameOptions(
     val width: Int,

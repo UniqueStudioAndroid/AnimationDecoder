@@ -1,5 +1,7 @@
 package com.hustunique.animation_decoder.api
 
+import kotlin.math.acos
+
 /**
  * Copyright (C) 2021 xiaoyuxuan
  * All rights reserved.
@@ -19,8 +21,35 @@ package com.hustunique.animation_decoder.api
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-data class AnimatedImage<DT>(
-    val frames: List<Frame<DT>>,
+class AnimatedImage<DT>(
     val loop: Int = 0,
     val backgroundColor: Int = 0x00000000
-)
+) {
+
+    val frames = mutableListOf<Frame<DT>>()
+
+    val onFrameCompletedAction = { frame: Frame<DT> ->
+        waitList.remove(frame)
+        frames.add(frame)
+        if (waitList.isEmpty()) {
+            onCompletedActions.forEach {
+                it(this)
+            }
+            onCompletedActions.clear()
+        }
+    }
+
+    private val waitList = mutableListOf<Frame<DT>>()
+
+    private val onCompletedActions = mutableListOf<(AnimatedImage<DT>) -> Unit>()
+
+    fun addFrame(frame: Frame<DT>) {
+        frame.onCompletedActions.add(onFrameCompletedAction)
+        waitList.add(frame)
+    }
+
+    fun onCompleted(action: (AnimatedImage<DT>) -> Unit) {
+        onCompletedActions.add(action)
+    }
+
+}

@@ -2,6 +2,7 @@ package com.hustunique.animation_decoder.apng
 
 import com.hustunique.animation_decoder.api.AnimatedImage
 import com.hustunique.animation_decoder.api.Frame
+import com.hustunique.animation_decoder.api.TaskDispatcher
 import com.hustunique.animation_decoder.core.*
 import com.hustunique.animation_decoder.core.exceptions.DecodeFailException
 import java.nio.ByteBuffer
@@ -34,22 +35,30 @@ class APngDecodable<DT> constructor(
 ) : PngDecodable<DT>(header, defaultFrame, others) {
 
 
-    override fun createAnimatedImage(decodeAction: DecodeAction<DT>) = AnimatedImage(
-        frames.map { frameData ->
-            Frame<DT>(
-                decodeAction(
-                    readable {
-                        add(SIGNATURE.asReadable())
-                        add(header.makeFakeIHDRReadable(frameData.fctl))
-                        addAll(frameData.chunks.map { it.asReadable() })
-                        addAll(others.map { it.asReadable() })
-                    }.asStream()
-                ) ?: throw DecodeFailException(),
-                frameData.fctl.toFrameOptions()
-            )
-        },
-        loop = actl.loop
-    )
+    override fun createAnimatedImage(
+        taskDispatcher: TaskDispatcher,
+        decodeAction: DecodeAction<DT>
+    ) =
+        AnimatedImage<DT>(
+            loop = actl.loop
+        ).apply {
+            this@APngDecodable.frames.map { frameData ->
+                addFrame(Frame<DT>(
+                    frameData.fctl.toFrameOptions()
+                ).also {
+                    taskDispatcher.dispatch {
+                        it.imgWrapper = decodeAction(
+                            readable {
+                                add(SIGNATURE.asReadable())
+                                add(header.makeFakeIHDRReadable(frameData.fctl))
+                                addAll(frameData.chunks.map { it.asReadable() })
+                                addAll(others.map { it.asReadable() })
+                            }.asStream()
+                        ) ?: throw DecodeFailException()
+                    }
+                })
+            }
+        }
 
     class Builder<DT> {
 
@@ -98,12 +107,23 @@ open class PngDecodable<DT> constructor(
         val SIGNATURE = ByteBuffer.allocate(8).putLong(APngParser.PNG_SIGNATURE)
     }
 
-    override fun createAnimatedImage(decodeAction: DecodeAction<DT>) = AnimatedImage(
-        listOf(Frame<DT>(decodeAction(readable {
-            add(SIGNATURE.asReadable())
-            add(header.asReadable())
-            addAll(defaultFrame.map { it.asReadable() })
-            addAll(others.map { it.asReadable() })
-        }.asStream()) ?: throw DecodeFailException(), null)),
-    )
+    override fun createAnimatedImage(
+        taskDispatcher: TaskDispatcher,
+        decodeAction: DecodeAction<DT>
+    ) =
+        AnimatedImage<DT>(
+        ).apply {
+            addFrame(Frame<DT>(null).also {
+                it.onCompletedActions.add(onFrameCompletedAction)
+                taskDispatcher.dispatch {
+                    it.imgWrapper = decodeAction(readable {
+                        add(SIGNATURE.asReadable())
+                        add(header.asReadable())
+                        addAll(defaultFrame.map { it.asReadable() })
+                        addAll(others.map { it.asReadable() })
+                    }.asStream()) ?: throw DecodeFailException()
+                }
+            }
+            )
+        }
 }
