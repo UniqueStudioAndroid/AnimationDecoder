@@ -1,4 +1,3 @@
-import bbs.hustunique.animation_decoder.gif.GifParser
 import org.junit.Test
 import java.io.File
 import java.nio.ByteBuffer

@@ -1,4 +1,4 @@
-package bbs.hustunique.animation_decoder.gif
+package com.hustunique.animation_decoder.gif
 
 import com.hustunique.animation_decoder.api.AnimatedImage
 import com.hustunique.animation_decoder.core.Decodable
@@ -28,12 +28,8 @@ import java.nio.ByteOrder
  */
 
 class GifParser : Decoder {
-    private fun parse(data: ByteBuffer): Decodable {
-        data.position(6)
 
-        val descriptor = parseLogicalDescriptor(data)
-        val globalColorTable = parseGlobalTableColor(data, descriptor)
-
+    private fun parse(data: ByteBuffer) {
         var type = data.get()
         while (type != GifChunkType.TYPE_TRAILER) {
             when (type) {
@@ -53,7 +49,25 @@ class GifParser : Decoder {
             type = data.get()
         }
 
-        return GifDecodable()
+//        return GifDecodable()
+    }
+
+    override fun <T> decode(
+        data: ByteBuffer,
+        frameDecoder: FrameDecoder<T>,
+    ): AnimatedImage<T> {
+        data.forward(6)
+
+        val descriptor = parseLogicalDescriptor(data)
+        val globalColorTable = parseGlobalTableColor(data, descriptor)
+
+//        var type = data.get()
+//        while (type != GifChunkType.TYPE_TRAILER) {
+//
+//        }
+        return AnimatedImage(
+            listOf()
+        )
     }
 
     override fun handles(data: ByteBuffer): Boolean {
@@ -61,10 +75,6 @@ class GifParser : Decoder {
         data.position(0)
         return head == GifChunkType.TYPE_HEAD_87A ||
                 head == GifChunkType.TYPE_HEAD_89A
-    }
-
-    override fun <T> decode(data: ByteBuffer, frameDecoder: FrameDecoder<T>): AnimatedImage<T> {
-        TODO("Not yet implemented")
     }
 
     private fun parseLogicalDescriptor(buffer: ByteBuffer): LogicalScreenDescriptor {
@@ -81,7 +91,7 @@ class GifParser : Decoder {
         buffer: ByteBuffer,
         descriptor: LogicalScreenDescriptor
     ): ByteBuffer? {
-        if (!descriptor.useGlobalColor) return null
+        if (descriptor.useGlobalColor) return null
         val data = ByteBuffer.wrap(
             buffer.array(),
             buffer.arrayOffset() + buffer.position(),

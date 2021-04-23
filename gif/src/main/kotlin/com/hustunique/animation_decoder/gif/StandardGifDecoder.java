@@ -1,4 +1,4 @@
-package bbs.hustunique.animation_decoder.gif;
+package com.hustunique.animation_decoder.gif;
 
 public class StandardGifDecoder implements GifDecoder {
   private static final String TAG = StandardGifDecoder.class.getSimpleName();

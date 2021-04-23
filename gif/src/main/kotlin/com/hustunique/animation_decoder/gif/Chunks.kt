@@ -1,8 +1,7 @@
 @file:Suppress("EXPERIMENTAL_API_USAGE")
 
-package bbs.hustunique.animation_decoder.gif
+package com.hustunique.animation_decoder.gif
 
-import com.sun.org.apache.xpath.internal.operations.Bool
 import java.nio.ByteBuffer
 
 open class BaseChunk(val buffer: ByteBuffer) {

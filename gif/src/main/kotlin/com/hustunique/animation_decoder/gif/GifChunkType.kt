@@ -1,9 +1,4 @@
-package bbs.hustunique.animation_decoder.gif
-
-import com.hustunique.animation_decoder.api.AnimatedImage
-import com.hustunique.animation_decoder.core.Decodable
-import com.hustunique.animation_decoder.core.DecodeAction
-import com.hustunique.animation_decoder.core.FrameDecoder
+package com.hustunique.animation_decoder.gif
 
 /**
  * Copyright (C) 2021 Ski
@@ -24,8 +19,19 @@ import com.hustunique.animation_decoder.core.FrameDecoder
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-class GifDecodable : Decodable {
-    override fun <T> createAnimatedImage(decodeAction: DecodeAction<T>): AnimatedImage<T> {
-        TODO("Not yet implemented")
-    }
+object GifChunkType {
+
+    const val TYPE_HEAD_87A = 0x474946383761
+    const val TYPE_HEAD_89A = 0x474946383961
+
+    const val TYPE_GRAPHIC_EXT = 0xF9.toByte()
+
+    const val TYPE_EXT_INTRODUCE = 0x21.toByte()
+
+    const val TYPE_TEXT_EXT = 0x01.toByte()
+    const val TYPE_IMAGE_DESC = 0x2C.toByte()
+    const val TYPE_APPLICATION_EXT = 0xFF.toByte()
+    const val TYPE_COMMENT_EXT = 0xFE.toByte()
+
+    const val TYPE_TRAILER = 0x3B.toByte()
 }
