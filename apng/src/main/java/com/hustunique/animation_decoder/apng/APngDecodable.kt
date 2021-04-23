@@ -25,18 +25,17 @@ import java.nio.ByteBuffer
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-class APngDecodable<DT> constructor(
+class APngDecodable constructor(
     header: IHDRChunk,
     val actl: ACTLChunk,
     defaultFrame: List<IDATChunk>,
     val frames: List<RawFrameData>,
     others: List<BaseChunk>
-) : PngDecodable<DT>(header, defaultFrame, others) {
+) : PngDecodable(header, defaultFrame, others) {
 
-
-    override fun createAnimatedImage(decodeAction: DecodeAction<DT>) = AnimatedImage(
+    override fun <T> createAnimatedImage(decodeAction: DecodeAction<T>) = AnimatedImage(
         frames.map { frameData ->
-            Frame<DT>(
+            Frame<T>(
                 decodeAction(
                     readable {
                         add(SIGNATURE.asReadable())
@@ -51,7 +50,7 @@ class APngDecodable<DT> constructor(
         loop = actl.loop
     )
 
-    class Builder<DT> {
+    class Builder {
 
         private var header: IHDRChunk? = null
         private var actl: ACTLChunk? = null
@@ -75,7 +74,7 @@ class APngDecodable<DT> constructor(
 
         fun addOthers(othersChunk: BaseChunk) = apply { others.add(othersChunk) }
 
-        fun build(): PngDecodable<DT> {
+        fun build(): PngDecodable {
             check(header != null) {
                 "Png file has no IHDRChunk"
             }
@@ -88,18 +87,18 @@ class APngDecodable<DT> constructor(
     }
 }
 
-open class PngDecodable<DT> constructor(
+open class PngDecodable constructor(
     val header: IHDRChunk,
     val defaultFrame: List<IDATChunk>,
     val others: List<BaseChunk>
-) : Decodable<DT> {
+) : Decodable {
 
     companion object {
-        val SIGNATURE = ByteBuffer.allocate(8).putLong(APngParser.PNG_SIGNATURE)
+        val SIGNATURE = ByteBuffer.allocate(8).putLong(APngDecoder.PNG_SIGNATURE)
     }
 
-    override fun createAnimatedImage(decodeAction: DecodeAction<DT>) = AnimatedImage(
-        listOf(Frame<DT>(decodeAction(readable {
+    override fun <T> createAnimatedImage(decodeAction: DecodeAction<T>) = AnimatedImage(
+        listOf(Frame<T>(decodeAction(readable {
             add(SIGNATURE.asReadable())
             add(header.asReadable())
             addAll(defaultFrame.map { it.asReadable() })

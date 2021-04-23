@@ -2,8 +2,8 @@ package com.hustunique.animation_decoder
 
 import android.graphics.Bitmap
 import com.hustunique.animation_decoder.api.AnimationDecoder
-import com.hustunique.animation_decoder.apng.APngParser
-import com.hustunique.animation_decoder.awebp.WebPParser
+import com.hustunique.animation_decoder.apng.APngDecoder
+import com.hustunique.animation_decoder.awebp.AWebPDecoder
 
 /**
  * Copyright (C) 2021 xiaoyuxuan
@@ -27,6 +27,6 @@ import com.hustunique.animation_decoder.awebp.WebPParser
 object Obj {
 
     val decoder: AnimationDecoder<Bitmap> =
-        AnimationDecoderImpl(listOf(WebPParser(), APngParser()), BitmapFactoryDecoder())
+        AnimationDecoderImpl(listOf(AWebPDecoder(), APngDecoder()), BitmapFactoryDecoder())
 
 }

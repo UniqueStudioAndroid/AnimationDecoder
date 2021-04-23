@@ -1,3 +1,4 @@
+include(":gif")
 include(":awebp")
 include(":api")
 include(":apng")

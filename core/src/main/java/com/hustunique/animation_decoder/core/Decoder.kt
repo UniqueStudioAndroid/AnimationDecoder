@@ -1,6 +1,7 @@
 package com.hustunique.animation_decoder.core
 
-import java.io.InputStream
+import com.hustunique.animation_decoder.api.AnimatedImage
+import java.nio.ByteBuffer
 
 /**
  * Copyright (C) 2021 xiaoyuxuan
@@ -21,8 +22,10 @@ import java.io.InputStream
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-interface FrameDecoder<T> {
+interface Decoder {
 
-    fun decode(inStream: InputStream): T
+    fun <T> decode(data: ByteBuffer, frameDecoder: FrameDecoder<T>): AnimatedImage<T>
+
+    fun handles(data: ByteBuffer): Boolean
 
 }

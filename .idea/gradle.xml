@@ -18,6 +18,7 @@
             <option value="$PROJECT_DIR$/awebp" />
             <option value="$PROJECT_DIR$/buildSrc" />
             <option value="$PROJECT_DIR$/core" />
+            <option value="$PROJECT_DIR$/gif" />
           </set>
         </option>
         <option name="resolveModulePerSourceSet" value="false" />

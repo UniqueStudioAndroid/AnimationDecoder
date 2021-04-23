@@ -1,9 +1,12 @@
-package com.hustunique.animation_decoder.core
+package bbs.hustunique.animation_decoder.gif
 
-import java.io.InputStream
+import com.hustunique.animation_decoder.api.AnimatedImage
+import com.hustunique.animation_decoder.core.Decodable
+import com.hustunique.animation_decoder.core.DecodeAction
+import com.hustunique.animation_decoder.core.FrameDecoder
 
 /**
- * Copyright (C) 2021 xiaoyuxuan
+ * Copyright (C) 2021 Ski
  * All rights reserved.
  *
  * This library is free software; you can redistribute it and/or
@@ -21,8 +24,8 @@ import java.io.InputStream
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-interface FrameDecoder<T> {
-
-    fun decode(inStream: InputStream): T
-
+class GifDecodable : Decodable {
+    override fun <T> createAnimatedImage(decodeAction: DecodeAction<T>): AnimatedImage<T> {
+        TODO("Not yet implemented")
+    }
 }

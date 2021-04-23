@@ -24,11 +24,11 @@ import com.hustunique.animation_decoder.core.exceptions.DecodeFailException
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-class WebPDecodable<DT> constructor(
+class WebPDecodable constructor(
     val animChunk: ANIMChunk,
     val anmfChunks: List<ANMFChunk>,
-) : Decodable<DT> {
-    override fun createAnimatedImage(decodeAction: DecodeAction<DT>): AnimatedImage<DT> = AnimatedImage(
+) : Decodable {
+    override fun <T> createAnimatedImage(decodeAction: DecodeAction<T>): AnimatedImage<T> = AnimatedImage(
         anmfChunks.map {
             Frame(
                 decodeAction(
@@ -46,7 +46,7 @@ class WebPDecodable<DT> constructor(
         backgroundColor = animChunk.color
     )
 
-    class Builder<DT> {
+    class Builder {
         private var animChunk: ANIMChunk? = null
         private val anmfChunks = ArrayList<ANMFChunk>()
 
@@ -57,7 +57,7 @@ class WebPDecodable<DT> constructor(
 
         fun addANMF(anmfChunk: ANMFChunk) = apply { anmfChunks.add(anmfChunk) }
 
-        fun build(): WebPDecodable<DT> = let {
+        fun build(): WebPDecodable = let {
             check(animChunk != null)
             WebPDecodable(animChunk!!, anmfChunks)
         }

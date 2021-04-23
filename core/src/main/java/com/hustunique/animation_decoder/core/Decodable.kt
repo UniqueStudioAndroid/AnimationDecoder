@@ -1,10 +1,10 @@
 package com.hustunique.animation_decoder.core
 
 import com.hustunique.animation_decoder.api.AnimatedImage
-import com.hustunique.animation_decoder.api.Frame
+import java.io.InputStream
 
 /**
- * Copyright (C) 2021 xiaoyuxuan
+ * Copyright (C) 2021 Ski
  * All rights reserved.
  *
  * This library is free software; you can redistribute it and/or
@@ -22,8 +22,10 @@ import com.hustunique.animation_decoder.api.Frame
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-interface Decodable<DT> {
+interface Decodable {
 
-    fun createAnimatedImage(decodeAction: DecodeAction<DT>): AnimatedImage<DT>
+    fun <T> createAnimatedImage(decodeAction: DecodeAction<T>): AnimatedImage<T>
 
 }
+
+typealias DecodeAction<T> = (InputStream) -> T

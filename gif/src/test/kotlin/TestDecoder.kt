@@ -1,9 +1,10 @@
-package com.hustunique.animation_decoder.core
-
+import bbs.hustunique.animation_decoder.gif.GifParser
+import org.junit.Test
+import java.io.File
 import java.nio.ByteBuffer
 
 /**
- * Copyright (C) 2021 xiaoyuxuan
+ * Copyright (C) 2021 Ski
  * All rights reserved.
  *
  * This library is free software; you can redistribute it and/or
@@ -21,10 +22,14 @@ import java.nio.ByteBuffer
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-interface Parser<DT> {
-
-    fun parse(data: ByteBuffer): Decodable<DT>
-
-    fun handles(data: ByteBuffer): Boolean
-
+class TestDecoder {
+    @Test
+    fun runParse() {
+        val data = ByteBuffer.wrap(File("test_gif.gif").readBytes())
+//        val parser = GifParser<Int>()
+//        check(parser.handles(data))
+//
+//        parser.parse(data)
+        println("OK")
+    }
 }

@@ -1,9 +1,7 @@
-package com.hustunique.animation_decoder.core
-
-import java.io.InputStream
+package bbs.hustunique.animation_decoder.gif
 
 /**
- * Copyright (C) 2021 xiaoyuxuan
+ * Copyright (C) 2021 Ski
  * All rights reserved.
  *
  * This library is free software; you can redistribute it and/or
@@ -21,8 +19,19 @@ import java.io.InputStream
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-interface FrameDecoder<T> {
+object GifChunkType {
 
-    fun decode(inStream: InputStream): T
+    const val TYPE_HEAD_87A = 0x474946383761
+    const val TYPE_HEAD_89A = 0x474946383961
 
+    const val TYPE_GRAPHIC_EXT = 0xF9.toByte()
+
+    const val TYPE_EXT_INTRODUCE = 0x21.toByte()
+
+    const val TYPE_TEXT_EXT = 0x01.toByte()
+    const val TYPE_IMAGE_DESC = 0x2C.toByte()
+    const val TYPE_APPLICATION_EXT = 0xFF.toByte()
+    const val TYPE_COMMENT_EXT = 0xFE.toByte()
+
+    const val TYPE_TRAILER = 0x3B.toByte()
 }

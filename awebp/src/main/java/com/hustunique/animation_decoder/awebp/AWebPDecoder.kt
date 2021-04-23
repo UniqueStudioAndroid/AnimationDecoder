@@ -1,7 +1,9 @@
 package com.hustunique.animation_decoder.awebp
 
+import com.hustunique.animation_decoder.api.AnimatedImage
 import com.hustunique.animation_decoder.core.Decodable
-import com.hustunique.animation_decoder.core.Parser
+import com.hustunique.animation_decoder.core.Decoder
+import com.hustunique.animation_decoder.core.FrameDecoder
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 
@@ -24,7 +26,8 @@ import java.nio.ByteOrder
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-class WebPParser<DT> : Parser<DT> {
+@Suppress("EXPERIMENTAL_API_USAGE")
+class AWebPDecoder : Decoder {
 
     private fun unBox(box: ByteBuffer): BaseChunk {
         val pos = box.position()
@@ -36,15 +39,13 @@ class WebPParser<DT> : Parser<DT> {
         return BaseChunk.makeChunk(type, buffer)
     }
 
-    @ExperimentalUnsignedTypes
-    override fun parse(data: ByteBuffer): Decodable<DT> {
+    private fun parse(data: ByteBuffer): Decodable {
         data.order(ByteOrder.LITTLE_ENDIAN)
         data.position(4)
         val size = data.int.toUInt()
         data.position(12)
 
-        val builder = WebPDecodable.Builder<DT>()
-//        val list = ArrayList<BaseChunk>()
+        val builder = WebPDecodable.Builder()
         while (data.remaining() > 0) {
             val chunk = unBox(data)
             when (chunk) {
@@ -53,9 +54,15 @@ class WebPParser<DT> : Parser<DT> {
                 else -> {
                 }
             }
-            println(chunk)
         }
         return builder.build()
+    }
+
+    override fun <T> decode(data: ByteBuffer, frameDecoder: FrameDecoder<T>): AnimatedImage<T> {
+        val decodable = parse(data)
+        return decodable.createAnimatedImage {
+            frameDecoder.decode(it)
+        }
     }
 
     override fun handles(data: ByteBuffer): Boolean {

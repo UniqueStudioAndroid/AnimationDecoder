@@ -22,22 +22,22 @@ package com.hustunique.animation_decoder
 import com.hustunique.animation_decoder.api.AnimatedImage
 import com.hustunique.animation_decoder.api.AnimationDecoder
 import com.hustunique.animation_decoder.core.FrameDecoder
-import com.hustunique.animation_decoder.core.Parser
+import com.hustunique.animation_decoder.core.Decoder
 import java.io.File
 import java.nio.ByteBuffer
+import kotlin.jvm.Throws
 
-class AnimationDecoderImpl<DT>(
-    private val parsers: List<Parser<DT>>,
-    private val frameDecoder: FrameDecoder<DT>
-) : AnimationDecoder<DT> {
+class AnimationDecoderImpl<T>(
+    private val decoders: List<Decoder>,
+    private val frameDecoder: FrameDecoder<T>
+) : AnimationDecoder<T> {
 
-    fun decode(path: String): AnimatedImage<DT> = decode(ByteBuffer.wrap(File(path).readBytes()))
+    fun decode(path: String): AnimatedImage<T> = decode(ByteBuffer.wrap(File(path).readBytes()))
 
     @Throws(IllegalStateException::class, IllegalArgumentException::class)
-    override fun decode(data: ByteBuffer): AnimatedImage<DT> {
-        val parsedObj = parsers.first { it.handles(data) }.parse(data)
-        return parsedObj.createAnimatedImage {
-            frameDecoder.decode(it)
-        }
+    override fun decode(data: ByteBuffer): AnimatedImage<T> {
+        val decoder = decoders.firstOrNull { it.handles(data) }
+        require(decoder != null)
+        return decoder.decode(data, frameDecoder)
     }
 }

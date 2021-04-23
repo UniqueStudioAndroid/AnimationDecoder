@@ -1,7 +1,9 @@
 package com.hustunique.animation_decoder.apng
 
+import com.hustunique.animation_decoder.api.AnimatedImage
 import com.hustunique.animation_decoder.core.Decodable
-import com.hustunique.animation_decoder.core.Parser
+import com.hustunique.animation_decoder.core.Decoder
+import com.hustunique.animation_decoder.core.FrameDecoder
 import java.nio.ByteBuffer
 
 /**
@@ -26,7 +28,7 @@ import java.nio.ByteBuffer
 /**
  * Represent a png file, extract from [data]
  */
-class APngParser<DT>() : Parser<DT> {
+class APngDecoder : Decoder {
     private var rawFrame: RawFrameData? = null
 
     companion object {
@@ -52,7 +54,7 @@ class APngParser<DT>() : Parser<DT> {
         return chunk
     }
 
-    private fun process(builder: APngDecodable.Builder<DT>, chunk: BaseChunk) {
+    private fun process(builder: APngDecodable.Builder, chunk: BaseChunk) {
         when (chunk) {
             is IHDRChunk -> {
                 builder.setHeader(chunk)
@@ -79,10 +81,10 @@ class APngParser<DT>() : Parser<DT> {
         return signature == PNG_SIGNATURE
     }
 
-    override fun parse(data: ByteBuffer): Decodable<DT> {
+    private fun parse(data: ByteBuffer): Decodable {
         reset()
         readAndCheckSignature(data)
-        val aPngParsedObjectBuilder = APngDecodable.Builder<DT>()
+        val aPngParsedObjectBuilder = APngDecodable.Builder()
         while (data.remaining() > 0) {
             val chunk = readAndUnBox(data)
             process(aPngParsedObjectBuilder, chunk)
@@ -91,6 +93,13 @@ class APngParser<DT>() : Parser<DT> {
             aPngParsedObjectBuilder.addFrame(it)
         }
         return aPngParsedObjectBuilder.build()
+    }
+
+    override fun <T> decode(data: ByteBuffer, frameDecoder: FrameDecoder<T>): AnimatedImage<T> {
+        val decodable = parse(data)
+        return decodable.createAnimatedImage {
+            frameDecoder.decode(it)
+        }
     }
 
     private fun reset() {
